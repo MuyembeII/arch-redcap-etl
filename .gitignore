@@ -43,7 +43,7 @@ composer.phar
 # config files (except example)
 *.properties
 /config/*
-!/config/config-example.ini
+!/config/config.ini
 
 # test config files (except README)
 /tests/config/*
