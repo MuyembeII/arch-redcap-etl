@@ -23,6 +23,12 @@ The REDCap-ETL external module is in the official external module
 repository ([REDCap Repo](https://redcap.vanderbilt.edu/consortium/modules/index.php)),
 and you should be able to find and install it from within REDCap.
 
+
+**How to start ETL manually:** To begin the ETL manually, run the following command under the root directory of the application
+
+        php bin/redcap_etl.php -c config/config.ini
+   
+
 Even though the REDCap-ETL external module is substantially easier to set up and use,
 there are still several cases where you might want to use the REDCap-ETL application:
 

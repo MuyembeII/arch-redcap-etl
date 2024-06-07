@@ -3,7 +3,7 @@ Copyright (C) 2019 The Trustees of Indiana University
 SPDX-License-Identifier: BSD-3-Clause
 ================================================== -->
 
-REDCap-ETL Configuration
+ARCH REDCap-ETL Configuration
 ========================
 
 This guide discusses the details of REDCap-ETL configuration properties.
@@ -16,8 +16,8 @@ The data source is the REDCap project that has the data to be extracted. It is s
 the REDCap API token for the project and the REDCap API URL for the REDCap instance that
 has the project, for example:
 
-    redcap_api_url = http://redcap.someplace.edu/api/
-    data_source_api_token = 1A2FC4E892CC712031BA94D1198127C1
+    redcap_api_url = https://redcap2.unza.zm/redcap/api/
+    data_source_api_token = ****BB1F81C4CF90968A4B3271017AC1
 
 
 Transformation Rules
