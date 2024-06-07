@@ -1,0 +1,38 @@
+DROP TABLE IF EXISTS arch_db.hh_screening;
+CREATE TABLE IF NOT EXISTS arch_db.hh_screening
+(
+    record_id                                    INT UNSIGNED                          NOT NULL PRIMARY KEY,
+    redcap_event_name                            tinytext                              not null,
+    redcap_repeat_instrument                     tinytext                              null,
+    redcap_repeat_instance                       tinytext                              null,
+    interview_date_scorres                       date                                  not null,
+    hhsidv_n_o_i                                 tinytext                              not null,
+    ward_obsloc                                  tinytext                              not null,
+    clstr_obsloc                                 int                                   not null,
+    sbn_obsloc                                   int                                   not null,
+    hun_obsloc                                   int                                   not null,
+    hhn_obsloc                                   int                                   not null,
+    hh_scrn_num_obsloc                           varchar(14)                           not null,
+    standing_obsloc                              tinyint                               not null,
+    hhe_hh_found                                 tinytext                              null,
+    hhe_hh_not_found                             tinytext                              null,
+    hhe_hh_destroyed                             tinytext                              null,
+    hh_sticker                                   bit                                   null,
+    hh_scrn_num_stk                              varchar(14)                           null,
+    hhsid_correct_flag_1                         bit                                   not null,
+    hhsid_correct_flag_2                         bit                                   not null,
+    conf_hh_scrn_num_yn                          bit                                   null,
+    hhsidv_hh_head_correct                       bit                                   null,
+    hhsidv_new_head_hh                           tinytext                              null,
+    hhsidv_longitude                             decimal(10, 7)                        not null,
+    hhsidv_latitude                              decimal(11, 7)                        not null,
+    hh_screening_outcome                         tinytext                              not null,
+    hhsidv_any_comments                          bit                                   not null,
+    hhsidv_comments                              text                                  null,
+    household_screening_id_verification_complete int                                   not null,
+    created_at                                   timestamp default current_timestamp() not null,
+    created_by                                   varchar(36)                           null,
+    updated_at                                   timestamp default current_timestamp() not null on update current_timestamp(),
+    updated_by                                   varchar(36)                           null
+);
+

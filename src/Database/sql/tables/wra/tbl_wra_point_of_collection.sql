@@ -1,0 +1,38 @@
+DROP TABLE IF EXISTS arch_db.wra_point_of_collection;
+CREATE TABLE IF NOT EXISTS arch_db.wra_point_of_collection
+(
+    poc_id                                    BIGINT UNSIGNED NOT NULL PRIMARY KEY,
+    record_id                                 BIGINT UNSIGNED NOT NULL,
+    redcap_event_name                         VARCHAR(32)     NOT NULL,
+    redcap_repeat_instrument                  VARCHAR(32),
+    redcap_repeat_instance                    TINYINT,
+    poc_visit_date                            DATE,
+    poc_hx_hypertension                       TINYINT,
+    bp_vsstat                                 TINYINT,
+    bp_sys_vsorres                            MEDIUMINT,
+    bp_dia_vsorres                            MEDIUMINT,
+    poc_is_cr_required                        TINYINT,
+    pulse_vsorres                             SMALLINT,
+    last_sex_scorres                          SMALLINT,
+    poc_wsh_lub                               SMALLINT,
+    poc_lt_antibiotics                        SMALLINT,
+    swab_spcperf                              SMALLINT,
+    swab_spcreasnd                            SMALLINT,
+    swab_othr_spcreasnd                       TINYTEXT,
+    poc_urine_preg_test_done                  TINYINT,
+    upt_lborres                               SMALLINT,
+    zpoc_preg_date                            TINYTEXT,
+    poc_preg_id                               VARCHAR(14),
+    upt_spcperf                               SMALLINT,
+    poc_reason_upt_nd_oth                     TINYTEXT,
+    poc_comments_yn                           BIT,
+    poc_comments                              TINYTEXT,
+    weight_peres                              NUMERIC(4, 1),
+    height_peres                              NUMERIC(4, 1),
+    bmi                                       NUMERIC(3, 1),
+    anth_bmi_result                           TINYTEXT,
+    pe_coyn                                   BIT,
+    wra_anthro_comments                       TINYTEXT,
+    wra_physical_exam_and_collection_complete SMALLINT
+);
+CREATE INDEX poc_record_id_idx ON arch_db.wra_point_of_collection (record_id);
