@@ -15,26 +15,21 @@ CREATE FUNCTION get_WRA_SecondContactOwner(p_wra_ptid VARCHAR(6))
 BEGIN
     DECLARE v_owner VARCHAR(15);
 
-    SELECT wl.loc_pn_belongs_oth_2
+    SELECT wfri.loc_pn_belongs_oth_2
     INTO @v_loc_owner_other
-    FROM wra_locator wl
-    WHERE wl.wra_ptid = p_wra_ptid;
+    FROM vw_wra_enrolled wl
+             LEFT JOIN wra_forms_repeating_instruments wfri on wl.record_id = wfri.record_id
+    WHERE wl.wra_ptid = p_wra_ptid
+      AND wfri.loc_pn_belongs_oth_2 <> ''
+    LIMIT 1;
 
-    SELECT
-    CASE wl.loc_pn_belongs_2
-        WHEN 1 THEN 'Self'
-        WHEN 2 THEN 'Spouse/Partner'
-        WHEN 3 THEN 'Sibling'
-        WHEN 4 THEN 'Aunt/Uncle'
-        WHEN 5 THEN 'Parent'
-        WHEN 6 THEN 'Child'
-        WHEN 7 THEN 'Friend/Neighbor'
-        WHEN 8 THEN CONCAT_WS('-', 'Other', @v_loc_owner_other_2)
-        ELSE ''
-        end sec_contact_number_owner
+    SELECT wfri.loc_pn_belongs_2_label as sec_contact_number_owner
     INTO @v_loc_owner
-    FROM wra_locator wl
-    WHERE wl.wra_ptid = p_wra_ptid;
+    FROM vw_wra_enrolled wl
+             LEFT JOIN wra_forms_repeating_instruments wfri on wl.record_id = wfri.record_id
+    WHERE wl.wra_ptid = p_wra_ptid
+      AND wfri.loc_pn_belongs_2_label <> ''
+    LIMIT 1;
     -- return the Owner
     RETURN @v_loc_owner;
 END $$

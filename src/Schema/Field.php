@@ -136,11 +136,11 @@ class Field
                 $mergedField->size = null;
             } elseif ($this->type === FieldType::INT && ! $this->usesLookup() && $field->type === FieldType::FLOAT) {
                 # convert non-multiple choice int to float
-                $mergedField->type = FieldType::FLOAT;
+                $mergedField->type = FieldType::INT;
                 $mergedField->size = null;
             } elseif ($field->type === FieldType::INT && ! $field->usesLookup() && $this->type === FieldType::FLOAT) {
                 # convert non-multiple choice int to float
-                $mergedField->type = FieldType::FLOAT;
+                $mergedField->type = FieldType::INT;
                 $mergedField->size = null;
             } else {
                 $message = $errorMessage . 'the database field type "'.$field->type.'"'.' does not match'

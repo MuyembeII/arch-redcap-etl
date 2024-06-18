@@ -2,9 +2,6 @@ DROP TABLE IF EXISTS arch_db.wra_locator;
 CREATE TABLE IF NOT EXISTS arch_db.wra_locator
 (
     record_id                  BIGINT UNSIGNED NOT NULL PRIMARY KEY,
-    redcap_event_name          VARCHAR(32)     NOT NULL,
-    redcap_repeat_instrument   VARCHAR(32)     NOT NULL,
-    redcap_repeat_instance     SMALLINT        NOT NULL,
     hh_scrn_num_obsloc         VARCHAR(14)     NOT NULL,
     hhe_hh_member_id           SMALLINT        NOT NULL,
     scrn_obsstdat              DATE,

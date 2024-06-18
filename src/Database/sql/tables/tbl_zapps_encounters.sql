@@ -1,0 +1,30 @@
+DROP TABLE IF EXISTS arch_etl_db.zapps_encounters;
+CREATE TABLE arch_etl_db.zapps_encounters
+(
+    id                                 INT         NOT NULL primary key AUTO_INCREMENT,
+    arch_ptid                          VARCHAR(17) NOT NULL,
+    redcap_event_name                  VARCHAR(24) NOT NULL,
+    redcap_repeat_instrument           VARCHAR(30),
+    redcap_repeat_instance             VARCHAR(30),
+    present                            MEDIUMTEXT,
+    ps_date                            DATE,
+    zapps_ptid                         VARCHAR(11),
+    iup                                TINYTEXT,
+    repeat_scan_dat                    DATE,
+    screen_proceed                     TINYTEXT,
+    ps_outcome                         MEDIUMTEXT,
+    outcome_date                       DATE,
+    ps_codes_1                         BIT         NOT NULL,
+    ps_codes_2                         BIT         NOT NULL,
+    ps_codes_3                         BIT         NOT NULL,
+    ps_codes_4                         BIT         NOT NULL,
+    ps_codes_5                         BIT         NOT NULL,
+    ps_codes_6                         BIT         NOT NULL,
+    ps_codes_7                         BIT         NOT NULL,
+    ps_codes_8                         BIT         NOT NULL,
+    ps_codes_9                         BIT         NOT NULL,
+    ps_codes_10                        BIT         NOT NULL,
+    ps_codes_11                        BIT         NOT NULL,
+    ps_codes_12                        BIT         NOT NULL,
+    zappsarch_participant_log_complete SMALLINT    NOT NULL
+);

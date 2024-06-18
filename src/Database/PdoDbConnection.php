@@ -99,7 +99,7 @@ abstract class PdoDbConnection extends DbConnection
                     break;
                     
                 case FieldType::FLOAT:
-                    $fieldDef .= 'FLOAT';
+                    $fieldDef .= 'BIGINT';
                     break;
     
                 case FieldType::CHAR:
@@ -436,7 +436,7 @@ abstract class PdoDbConnection extends DbConnection
                     break;
                 case FieldType::FLOAT:
                     if (isset($rowData[$fieldDbName]) && is_numeric($rowData[$fieldDbName])) {
-                        $rowValues[] = (float) $rowData[$fieldDbName];
+                        $rowValues[] = $rowData[$fieldDbName];
                     } else {
                         $rowValues[] = 'null';
                     }
