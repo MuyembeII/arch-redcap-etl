@@ -353,8 +353,7 @@ BEGIN
     WHERE v1.record_id NOT IN (SELECT f1.record_id FROM vw_wra_first_fu_visit_overview f1)
       AND v1.record_id NOT IN (SELECT f2.record_id FROM vw_wra_second_fu_visit_overview f2)
       AND v1.record_id NOT IN (SELECT f3.record_id FROM vw_wra_third_fu_visit_overview f3)
-      AND v1.record_id NOT IN ((SELECT v5.record_id
-                                FROM vw_wra_fourth_fu_visit_overview v5))
+      AND v1.record_id NOT IN (SELECT f4.record_id FROM vw_wra_fourth_fu_visit_overview f4)
     UNION
     SELECT v2.record_id,
            v2.screening_id,
@@ -369,8 +368,7 @@ BEGIN
              LEFT JOIN vw_wra_fourth_fu_visit_overview v5 ON v2.record_id = v5.record_id
     WHERE v2.record_id NOT IN (SELECT f2.record_id FROM vw_wra_second_fu_visit_overview f2)
       AND v2.record_id NOT IN (SELECT f3.record_id FROM vw_wra_third_fu_visit_overview f3)
-      AND v2.record_id NOT IN ((SELECT v5.record_id
-                                FROM vw_wra_fourth_fu_visit_overview v5))
+      AND v2.record_id NOT IN (SELECT f4.record_id FROM vw_wra_fourth_fu_visit_overview f4)
     UNION
     SELECT v3.record_id,
            v3.screening_id,
@@ -384,8 +382,7 @@ BEGIN
     FROM vw_wra_second_fu_visit_overview v3
              LEFT JOIN vw_wra_fourth_fu_visit_overview v5 ON v3.record_id = v5.record_id
     WHERE v3.record_id NOT IN (SELECT f3.record_id FROM vw_wra_third_fu_visit_overview f3)
-      AND v3.record_id NOT IN (SELECT v5.record_id
-                               FROM vw_wra_fourth_fu_visit_overview v5)
+      AND v3.record_id NOT IN (SELECT f4.record_id FROM vw_wra_fourth_fu_visit_overview f4)
     UNION
     SELECT v4.record_id,
            v4.screening_id,
@@ -397,8 +394,7 @@ BEGIN
                     DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) as follow_up_4_visit_date_days_late
     FROM vw_wra_third_fu_visit_overview v4
              LEFT JOIN vw_wra_fourth_fu_visit_overview v5 ON v4.record_id = v5.record_id
-    WHERE v4.record_id NOT IN (SELECT v5.record_id
-                               FROM vw_wra_fourth_fu_visit_overview v5);
+    WHERE v4.record_id NOT IN (SELECT f4.record_id FROM vw_wra_fourth_fu_visit_overview f4);
 
     -- Total number of fourth follow-up visit due
     SET @v_wra_fu_5_visits_due_total = (SELECT COUNT(DISTINCT f4.record_id)
