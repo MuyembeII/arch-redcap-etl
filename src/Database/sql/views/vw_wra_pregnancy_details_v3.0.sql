@@ -8,6 +8,9 @@
 CREATE OR REPLACE ALGORITHM = MERGE VIEW vw_wra_pregnancy_details_v3
 AS
 SELECT DISTINCT e.record_id,
+                v.visit_id,
+                v.visit_number,
+                v.visit_alias,
                 TRIM(e.screening_id)                                                        as screening_id,
                 e.member_id,
                 ps.ps_fu_visit_date_f2                                                      as visit_date,

@@ -15,6 +15,15 @@ CREATE FUNCTION get_WRA_HH_Screening_ID(p_record_id INT)
 BEGIN
     DECLARE v_hh_screening_id VARCHAR(14);
 
+    -- Get HH SID Visit 5.0
+    SELECT v5.fu_loc_same_hh_lv_f4,
+           CONCAT_WS('-', v5.wra_fu_cluster_new_f4_label, v5.wra_fu_sbn_new_f4_label, v5.wra_fu_hun_new_f4_label,
+                     v5.wra_fu_hhn_new_f4_label)
+    INTO @v_v5_same_hh, @v_v5_new_hh
+    FROM wra_follow_up_visit_4_repeating_instruments v5
+    WHERE v5.record_id = p_record_id
+      AND v5.wra_fu_pp_avail_f4 = 1;
+
     -- Get HH SID Visit 4.0
     SELECT v4.fu_loc_same_hh_lv_f3,
            CONCAT_WS('-', v4.wra_fu_cluster_prev_f3_label, v4.wra_fu_sbn_prev_f3_label, v4.wra_fu_hun_prev_f3_label,
@@ -50,7 +59,9 @@ BEGIN
       AND v1.wra_enr_pp_avail = 1;
 
     -- Start with last visit
-    IF @v_v4_same_hh = 0 THEN
+    IF @v_v5_same_hh = 0 THEN
+        SET v_hh_screening_id = @v_v5_new_hh;
+    ELSEIF @v_v4_same_hh = 0 THEN
         SET v_hh_screening_id = @v_v4_new_hh;
     ELSEIF @v_v3_same_hh = 0 THEN
         SET v_hh_screening_id = @v_v3_new_hh;

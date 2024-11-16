@@ -7,13 +7,13 @@
       <sourceFolder url="file://$MODULE_DIR$/dependencies/iu-redcap/phpcap/tests/integration" isTestSource="true" packagePrefix="IU\PHPCap\" />
       <sourceFolder url="file://$MODULE_DIR$/dependencies/iu-redcap/phpcap/tests/unit" isTestSource="true" packagePrefix="IU\PHPCap\" />
       <sourceFolder url="file://$MODULE_DIR$/dependencies/iu-redcap/phpcap/tests/util" isTestSource="true" packagePrefix="IU\PHPCap\" />
-      <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" packagePrefix="IU\REDCapETL\" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tests/integration" isTestSource="true" packagePrefix="IU\REDCapETL\" />
       <sourceFolder url="file://$MODULE_DIR$/tests/system" isTestSource="true" packagePrefix="IU\REDCapETL\" />
       <sourceFolder url="file://$MODULE_DIR$/tests/unit" isTestSource="true" packagePrefix="IU\REDCapETL\" />
       <sourceFolder url="file://$MODULE_DIR$/tests/util" isTestSource="true" packagePrefix="IU\REDCapETL\" />
+      <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/instantiator" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/iu-redcap/phpcap" />

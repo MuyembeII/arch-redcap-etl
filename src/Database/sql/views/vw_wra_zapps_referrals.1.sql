@@ -1,9 +1,9 @@
 /**
- * List of WRA ARCH-ZAPPS Referrals.
+ * List of WRA POC.
  *
  * @author Gift Jr <muyembegift@gmail.com> | 04.09.24
  * @since 0.0.1
- * @alias WRA ZAPPS List
+ * @alias WRA POC List
  */
 CREATE OR REPLACE ALGORITHM = MERGE VIEW vw_wra_zapps_referrals
 AS
@@ -16,11 +16,21 @@ FROM (SELECT DISTINCT e.record_id,
                       e.wra_ptid,
                       REPLACE(CONCAT_WS(' ', e.first_name, e.middle_name, e.last_name), '  ', ' ') as wra_name,
                       e.age,
-                      wc.wra_first_contact_v1                                                      as first_contact_number,
-                      wc.wra_first_contact_owner_v1                                                as first_contact_number_owner,
+                      COALESCE(
+                              wc.wra_first_contact_v4,
+                              wc.wra_first_contact_v3,
+                              wc.wra_first_contact_v2,
+                              wc.wra_first_contact_v1
+                      )                                                                            as first_contact_number,
+                      l.first_contact_number_owner,
                       l.first_contact_number_caller_id,
-                      wc.wra_second_contact_v1                                                     as second_contact_number,
-                      wc.wra_second_contact_owner_v1,
+                      COALESCE(
+                              wc.wra_second_contact_v4,
+                              wc.wra_second_contact_v3,
+                              wc.wra_second_contact_v2,
+                              wc.wra_second_contact_v1
+                      )                                                                            as second_contact_number,
+                      l.second_contact_number_owner,
                       l.second_contact_number_caller_id,
                       v1.wra_enr_pp_avail_label                                                    as is_wra_available,
                       vwp.upt_result,
@@ -40,7 +50,7 @@ FROM (SELECT DISTINCT e.record_id,
       WHERE v1.wra_enr_pp_avail = 1
         AND vwp.visit_number = 1.0
         AND vwp.upt_result = 'Positive'
-        AND pv1.zapps_referral_acceptance IS NOT NULL
+        AND pv1.zapps_referral_acceptance = 'Yes'
       UNION
       SELECT DISTINCT e.record_id,
                       e.screening_id,
@@ -51,22 +61,20 @@ FROM (SELECT DISTINCT e.record_id,
                       REPLACE(CONCAT_WS(' ', e.first_name, e.middle_name, e.last_name), '  ', ' ') as wra_name,
                       e.age,
                       COALESCE(
+                              wc.wra_first_contact_v4,
+                              wc.wra_first_contact_v3,
                               wc.wra_first_contact_v2,
                               wc.wra_first_contact_v1
                       )                                                                            as first_contact_number,
-                      COALESCE(
-                              wc.wra_first_contact_owner_v2,
-                              wc.wra_first_contact_owner_v1
-                      )                                                                            as first_contact_number_owner,
+                      l.first_contact_number_owner,
                       l.first_contact_number_caller_id,
                       COALESCE(
+                              wc.wra_second_contact_v4,
+                              wc.wra_second_contact_v3,
                               wc.wra_second_contact_v2,
                               wc.wra_second_contact_v1
                       )                                                                            as second_contact_number,
-                      COALESCE(
-                              wc.wra_second_contact_owner_v2,
-                              wc.wra_second_contact_owner_v1
-                      )                                                                            as second_contact_number_owner,
+                      l.second_contact_number_owner,
                       l.second_contact_number_caller_id,
                       v2.wra_fu_pp_avail_label                                                     as is_wra_available,
                       vwp.upt_result,
@@ -86,7 +94,7 @@ FROM (SELECT DISTINCT e.record_id,
       WHERE v2.wra_fu_pp_avail = 1
         AND vwp.visit_number = 2.0
         AND vwp.upt_result = 'Positive'
-        AND pv2.zapps_referral_acceptance IS NOT NULL
+        AND pv2.zapps_referral_acceptance = 'Yes'
       UNION
       SELECT DISTINCT v3.record_id,
                       e.screening_id,
@@ -97,26 +105,20 @@ FROM (SELECT DISTINCT e.record_id,
                       REPLACE(CONCAT_WS(' ', e.first_name, e.middle_name, e.last_name), '  ', ' ') as wra_name,
                       e.age,
                       COALESCE(
+                              wc.wra_first_contact_v4,
                               wc.wra_first_contact_v3,
                               wc.wra_first_contact_v2,
                               wc.wra_first_contact_v1
                       )                                                                            as first_contact_number,
-                      COALESCE(
-                              wc.wra_first_contact_owner_v3,
-                              wc.wra_first_contact_owner_v2,
-                              wc.wra_first_contact_owner_v1
-                      )                                                                            as first_contact_number_owner,
+                      l.first_contact_number_owner,
                       l.first_contact_number_caller_id,
                       COALESCE(
+                              wc.wra_second_contact_v4,
                               wc.wra_second_contact_v3,
                               wc.wra_second_contact_v2,
                               wc.wra_second_contact_v1
                       )                                                                            as second_contact_number,
-                      COALESCE(
-                              wc.wra_second_contact_owner_v3,
-                              wc.wra_second_contact_owner_v2,
-                              wc.wra_second_contact_owner_v1
-                      )                                                                            as second_contact_number_owner,
+                      l.second_contact_number_owner,
                       l.second_contact_number_caller_id,
                       v3.wra_enr_pp_avail_f2_label                                                 as is_wra_available,
                       vwp.upt_result,
@@ -136,7 +138,7 @@ FROM (SELECT DISTINCT e.record_id,
       WHERE v3.wra_enr_pp_avail_f2 = 1
         AND vwp.visit_number = 3.0
         AND vwp.upt_result = 'Positive'
-        AND pv3.zapps_referral_acceptance IS NOT NULL
+        AND pv3.zapps_referral_acceptance = 'Yes'
       UNION
       SELECT DISTINCT v4.record_id,
                       e.screening_id,
@@ -152,12 +154,7 @@ FROM (SELECT DISTINCT e.record_id,
                               wc.wra_first_contact_v2,
                               wc.wra_first_contact_v1
                       )                                                                            as first_contact_number,
-                      COALESCE(
-                              wc.wra_first_contact_owner_v4,
-                              wc.wra_first_contact_owner_v3,
-                              wc.wra_first_contact_owner_v2,
-                              wc.wra_first_contact_owner_v1
-                      )                                                                            as first_contact_number_owner,
+                      l.first_contact_number_owner,
                       l.first_contact_number_caller_id,
                       COALESCE(
                               wc.wra_second_contact_v4,
@@ -165,12 +162,7 @@ FROM (SELECT DISTINCT e.record_id,
                               wc.wra_second_contact_v2,
                               wc.wra_second_contact_v1
                       )                                                                            as second_contact_number,
-                      COALESCE(
-                              wc.wra_second_contact_owner_v4,
-                              wc.wra_second_contact_owner_v3,
-                              wc.wra_second_contact_owner_v2,
-                              wc.wra_second_contact_owner_v1
-                      )                                                                            as second_contact_number_owner,
+                      l.second_contact_number_owner,
                       l.second_contact_number_caller_id,
                       v4.wra_fu_pp_avail_f3_label                                                  as is_wra_available,
                       vwp.upt_result,
@@ -190,7 +182,7 @@ FROM (SELECT DISTINCT e.record_id,
       WHERE v4.wra_fu_pp_avail_f3 = 1
         AND vwp.visit_number = 4.0
         AND vwp.upt_result = 'Positive'
-        AND pv4.zapps_referral_acceptance IS NOT NULL
+        AND pv4.zapps_referral_acceptance = 'Yes'
       UNION
       SELECT DISTINCT v5.record_id,
                       e.screening_id,
@@ -207,13 +199,7 @@ FROM (SELECT DISTINCT e.record_id,
                               wc.wra_first_contact_v2,
                               wc.wra_first_contact_v1
                       )                                                                            as first_contact_number,
-                      COALESCE(
-                              wc.wra_first_contact_owner_v5,
-                              wc.wra_first_contact_owner_v4,
-                              wc.wra_first_contact_owner_v3,
-                              wc.wra_first_contact_owner_v2,
-                              wc.wra_first_contact_owner_v1
-                      )                                                                            as first_contact_number_owner,
+                      l.first_contact_number_owner,
                       l.first_contact_number_caller_id,
                       COALESCE(
                               wc.wra_second_contact_v5,
@@ -222,13 +208,7 @@ FROM (SELECT DISTINCT e.record_id,
                               wc.wra_second_contact_v2,
                               wc.wra_second_contact_v1
                       )                                                                            as second_contact_number,
-                      COALESCE(
-                              wc.wra_second_contact_owner_v5,
-                              wc.wra_second_contact_owner_v4,
-                              wc.wra_second_contact_owner_v3,
-                              wc.wra_second_contact_owner_v2,
-                              wc.wra_second_contact_owner_v1
-                      )                                                                            as second_contact_number_owner,
+                      l.second_contact_number_owner,
                       l.second_contact_number_caller_id,
                       v5.wra_fu_pp_avail_f4_label                                                  as is_wra_available,
                       vwp.upt_result,
@@ -248,6 +228,6 @@ FROM (SELECT DISTINCT e.record_id,
       WHERE v5.wra_fu_pp_avail_f4 = 1
         AND vwp.visit_number = 5.0
         AND vwp.upt_result = 'Positive'
-        AND pv5.zapps_referral_acceptance IS NOT NULL) z
+        AND pv5.zapps_referral_acceptance = 'Yes') z
 ORDER BY z.visit_date DESC;
 

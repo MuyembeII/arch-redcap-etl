@@ -59,3 +59,7 @@ composer.phar
 
 # ignore atom tags
 *.tags*
+.idea/codeception.xml
+.idea/phpspec.xml
+.idea/redcap-etl.iml
+.idea/phpunit.xml

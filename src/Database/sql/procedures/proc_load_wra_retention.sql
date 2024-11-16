@@ -108,6 +108,18 @@ BEGIN
         follow_up_3_visit_date_days_late SMALLINT
     );
 
+    DROP TEMPORARY TABLE IF EXISTS wra_fu_visit_4_overview;
+    CREATE TEMPORARY TABLE wra_fu_visit_4_overview
+    (
+        record_id                        BIGINT,
+        screening_id                     VARCHAR(14),
+        wra_ptid                         VARCHAR(6),
+        last_visit_date                  DATE,
+        follow_up_4_visit_date           DATE,
+        follow_up_4_last_visit_date      DATE,
+        follow_up_4_visit_date_days_late SMALLINT
+    );
+
     START TRANSACTION;
 
     SET @v_wra_fu_1_visits_total = 5508;
@@ -125,11 +137,11 @@ BEGIN
 
     SET @v_wra_visit_1_screened_and_followed_up = (SELECT COUNT(DISTINCT f1.record_id)
                                                    FROM vw_wra_first_fu_visit_overview f1
-                                                   WHERE f1.visit_status = 'Available');
+                                                   WHERE f1.visit_status IN ('Available', 'Yes'));
 
     SET @v_wra_visit_1_extended_absence = (SELECT COUNT(DISTINCT f1.record_id)
                                            FROM vw_wra_first_fu_visit_overview f1
-                                           WHERE f1.visit_status = 'Extended-Absence');
+                                           WHERE f1.visit_status IN ('Extended-Absence', 'No, Extended Absence'));
 
     SET @v_wra_visit_1_untraceable = (SELECT COUNT(DISTINCT f1.record_id)
                                       FROM vw_wra_first_fu_visit_overview f1
@@ -140,7 +152,7 @@ BEGIN
                                    WHERE f1.visit_status = 'Deferred');
 
     UPDATE crt_wra_retention ret
-    SET ret.wra_visit_ltfu               = @v_wra_visit_1_ltfu,
+    SET ret.wra_visit_missed_appointment = @v_wra_visit_1_ltfu,
         ret.wra_visit_untraceable        = @v_wra_visit_1_untraceable,
         ret.wra_visit_deferred           = @v_wra_visit_1_deferred,
         ret.wra_visit_extended_absence   = @v_wra_visit_1_extended_absence,
@@ -156,23 +168,29 @@ BEGIN
     SELECT v1.record_id,
            v1.screening_id,
            v1.wra_ptid,
-           v1.screening_date                                             as last_visit_date,
+           COALESCE(v3.visit_date, v1.screening_date)                    as last_visit_date,
            DATE_ADD(v1.screening_date, INTERVAL (90 + 90) DAY)           as follow_up_2_visit_date,
            DATE_ADD(v1.screening_date, INTERVAL (90 + (90 + 21)) DAY)    as follow_up_2_last_visit_date,
            DATEDIFF(CURRENT_DATE,
                     DATE_ADD(v1.screening_date, INTERVAL (90 + 90) DAY)) as follow_up_2_visit_date_days_late
     FROM vw_wra_baseline_visit_overview v1
+             LEFT JOIN vw_wra_second_fu_visit_overview v3 ON v1.record_id = v3.record_id
     WHERE v1.record_id NOT IN (SELECT v2.record_id FROM vw_wra_first_fu_visit_overview v2)
+      AND v1.record_id NOT IN (SELECT v3.record_id
+                               FROM vw_wra_second_fu_visit_overview v3)
     UNION
     SELECT v2.record_id,
            v2.screening_id,
            v2.wra_ptid,
-           v2.visit_date                                                       as last_visit_date,
-           DATE_ADD(v2.date_of_enrollment, INTERVAL ((90 + 90)) DAY)           as follow_up_2_visit_date,
-           DATE_ADD(v2.date_of_enrollment, INTERVAL (90 + (90 + 21)) DAY)      as follow_up_2_last_visit_date,
+           COALESCE(v3.visit_date, v2.visit_date)                 as last_visit_date,
+           DATE_ADD(v2.visit_date, INTERVAL ((90)) DAY)           as follow_up_2_visit_date,
+           DATE_ADD(v2.visit_date, INTERVAL ((90 + 21)) DAY)      as follow_up_2_last_visit_date,
            DATEDIFF(CURRENT_DATE,
-                    DATE_ADD(v2.date_of_enrollment, INTERVAL ((90 + 90)) DAY)) as follow_up_2_visit_date_days_late
-    FROM vw_wra_first_fu_visit_overview v2;
+                    DATE_ADD(v2.visit_date, INTERVAL ((90)) DAY)) as follow_up_2_visit_date_days_late
+    FROM vw_wra_first_fu_visit_overview v2
+             LEFT JOIN vw_wra_second_fu_visit_overview v3 ON v2.record_id = v3.record_id
+    WHERE v2.record_id NOT IN (SELECT v3.record_id
+                               FROM vw_wra_second_fu_visit_overview v3);
 
     -- Total number of second follow-up visit due
     SET @v_wra_fu_2_visits_total = (SELECT COUNT(DISTINCT f2.record_id)
@@ -197,11 +215,11 @@ BEGIN
 
     SET @v_wra_visit_2_screened_and_followed_up = (SELECT COUNT(DISTINCT f2.record_id)
                                                    FROM vw_wra_second_fu_visit_overview f2
-                                                   WHERE f2.visit_status = 'Available');
+                                                   WHERE f2.visit_status IN ('Available', 'Yes'));
 
     SET @v_wra_visit_2_extended_absence = (SELECT COUNT(DISTINCT f2.record_id)
                                            FROM vw_wra_second_fu_visit_overview f2
-                                           WHERE f2.visit_status = 'Extended-Absence');
+                                           WHERE f2.visit_status IN ('Extended-Absence', 'No, Extended Absence'));
 
     SET @v_wra_visit_2_untraceable = (SELECT COUNT(DISTINCT f2.record_id)
                                       FROM vw_wra_second_fu_visit_overview f2
@@ -212,7 +230,7 @@ BEGIN
                                    WHERE f2.visit_status = 'Deferred');
 
     UPDATE crt_wra_retention ret
-    SET ret.wra_visit_ltfu               = @v_wra_visit_2_ltfu,
+    SET ret.wra_visit_missed_appointment = @v_wra_visit_2_ltfu,
         ret.wra_visit_untraceable        = @v_wra_visit_2_untraceable,
         ret.wra_visit_deferred           = @v_wra_visit_2_deferred,
         ret.wra_visit_extended_absence   = @v_wra_visit_2_extended_absence,
@@ -227,37 +245,46 @@ BEGIN
     SELECT v1.record_id,
            v1.screening_id,
            v1.wra_ptid,
-           v1.screening_date                                                             as last_visit_date,
+           COALESCE(v4.visit_date, v1.screening_date),
            DATE_ADD(v1.screening_date, INTERVAL ((90) + (90 + 21) + (90)) DAY)           as follow_up_3_visit_date,
-           DATE_ADD(v1.screening_date, INTERVAL ((90) + (90 + 21) + (90 + 21)) DAY)      as follow_up_3_last_visit_date,
+           DATE_ADD(v1.screening_date, INTERVAL ((90) + (90 + 21) + (90 + 21))
+                    DAY)                                                                 as follow_up_3_last_visit_date,
            DATEDIFF(CURRENT_DATE,
                     DATE_ADD(v1.screening_date, INTERVAL ((90) + (90 + 21) + (90)) DAY)) as follow_up_3_visit_date_days_late
     FROM vw_wra_baseline_visit_overview v1
+             LEFT JOIN vw_wra_third_fu_visit_overview v4 ON v1.record_id = v4.record_id
     WHERE v1.record_id NOT IN (SELECT f1.record_id FROM vw_wra_first_fu_visit_overview f1)
       AND v1.record_id NOT IN (SELECT f2.record_id FROM vw_wra_second_fu_visit_overview f2)
+      AND v1.record_id NOT IN ((SELECT v4.record_id
+                                FROM vw_wra_third_fu_visit_overview v4))
     UNION
     SELECT v2.record_id,
            v2.screening_id,
            v2.wra_ptid,
-           v2.visit_date                                                                as last_visit_date,
-           DATE_ADD(v2.date_of_enrollment, INTERVAL ((90) + (90 + 21) + (90)) DAY)      as follow_up_3_visit_date,
-           DATE_ADD(v2.date_of_enrollment, INTERVAL ((90) + (90 + 21) + (90 + 21)) DAY) as follow_up_3_last_visit_date,
+           COALESCE(v4.visit_date, v2.visit_date)                             as last_visit_date,
+           DATE_ADD(v2.visit_date, INTERVAL ((90 + 21) + (90)) DAY)           as follow_up_3_visit_date,
+           DATE_ADD(v2.visit_date, INTERVAL ((90 + 21) + (90 + 21)) DAY)      as follow_up_3_last_visit_date,
            DATEDIFF(CURRENT_DATE,
-                    DATE_ADD(v2.date_of_enrollment, INTERVAL ((90) + (90 + 21) + (90))
-                             DAY))                                                      as follow_up_3_visit_date_days_late
+                    DATE_ADD(v2.visit_date, INTERVAL ((90 + 21) + (90)) DAY)) as follow_up_3_visit_date_days_late
     FROM vw_wra_first_fu_visit_overview v2
+             LEFT JOIN vw_wra_third_fu_visit_overview v4 ON v2.record_id = v4.record_id
     WHERE v2.record_id NOT IN (SELECT f2.record_id FROM vw_wra_second_fu_visit_overview f2)
+      AND v2.record_id NOT IN ((SELECT v4.record_id
+                                FROM vw_wra_third_fu_visit_overview v4))
     UNION
     SELECT v3.record_id,
            v3.screening_id,
            v3.wra_ptid,
-           v3.visit_date                                                                as last_visit_date,
-           DATE_ADD(v3.date_of_enrollment, INTERVAL ((90) + (90 + 21) + (90)) DAY)      as follow_up_3_visit_date,
-           DATE_ADD(v3.date_of_enrollment, INTERVAL ((90) + (90 + 21) + (90 + 21)) DAY) as follow_up_3_last_visit_date,
+           COALESCE(v4.visit_date, v3.visit_date)            as last_visit_date,
+           DATE_ADD(v3.visit_date, INTERVAL ((90)) DAY)      as follow_up_3_visit_date,
+           DATE_ADD(v3.visit_date, INTERVAL ((90 + 21)) DAY) as follow_up_3_last_visit_date,
            DATEDIFF(CURRENT_DATE,
-                    DATE_ADD(v3.date_of_enrollment, INTERVAL ((90) + (90 + 21) + (90))
-                             DAY))                                                      as follow_up_3_visit_date_days_late
-    FROM vw_wra_second_fu_visit_overview v3;
+                    DATE_ADD(v3.visit_date, INTERVAL ((90))
+                             DAY))                           as follow_up_3_visit_date_days_late
+    FROM vw_wra_second_fu_visit_overview v3
+             LEFT JOIN vw_wra_third_fu_visit_overview v4 ON v3.record_id = v4.record_id
+    WHERE v3.record_id NOT IN (SELECT v4.record_id
+                               FROM vw_wra_third_fu_visit_overview v4);
 
     -- Total number of third follow-up visit due
     SET @v_wra_fu_3_visits_due_total = (SELECT COUNT(DISTINCT f3.record_id)
@@ -285,11 +312,11 @@ BEGIN
 
     SET @v_wra_visit_3_screened_and_followed_up = (SELECT COUNT(DISTINCT f3.record_id)
                                                    FROM vw_wra_third_fu_visit_overview f3
-                                                   WHERE f3.visit_status = 'Available');
+                                                   WHERE f3.visit_status IN ('Available', 'Yes'));
 
     SET @v_wra_visit_3_extended_absence = (SELECT COUNT(DISTINCT f3.record_id)
                                            FROM vw_wra_third_fu_visit_overview f3
-                                           WHERE f3.visit_status = 'Extended-Absence');
+                                           WHERE f3.visit_status IN ('Extended-Absence', 'No, Extended Absence'));
 
     SET @v_wra_visit_3_untraceable = (SELECT COUNT(DISTINCT f3.record_id)
                                       FROM vw_wra_third_fu_visit_overview f3
@@ -300,7 +327,7 @@ BEGIN
                                    WHERE f3.visit_status = 'Deferred');
 
     UPDATE crt_wra_retention ret
-    SET ret.wra_visit_ltfu               = @v_wra_visit_3_ltfu,
+    SET ret.wra_visit_missed_appointment = @v_wra_visit_3_ltfu,
         ret.wra_visit_untraceable        = @v_wra_visit_3_untraceable,
         ret.wra_visit_deferred           = @v_wra_visit_3_deferred,
         ret.wra_visit_extended_absence   = @v_wra_visit_3_extended_absence,
@@ -309,6 +336,121 @@ BEGIN
         ret.wra_visits_total             = @v_wra_fu_3_visits_due_total,
         ret.wra_visit_total_remaining    = @v_wra_visit_3_remaining_total
     WHERE ret.visit_number = 4.0;
+    /*------------------------------------------------------------------------------------------------------------*/
+    INSERT INTO wra_fu_visit_4_overview(record_id, screening_id, wra_ptid, last_visit_date, follow_up_4_visit_date,
+                                        follow_up_4_last_visit_date, follow_up_4_visit_date_days_late)
+    SELECT v1.record_id,
+           v1.screening_id,
+           v1.wra_ptid,
+           COALESCE(v5.visit_date, v1.screening_date)                              as last_visit_date,
+           DATE_ADD(v1.screening_date, INTERVAL (90 + 90 + 90 + 90) DAY)           as follow_up_4_visit_date,
+           DATE_ADD(v1.screening_date, INTERVAL ((90 + 90 + 90 + 90) + 21)
+                    DAY)                                                           as follow_up_4_last_visit_date,
+           DATEDIFF(CURRENT_DATE,
+                    DATE_ADD(v1.screening_date, INTERVAL (90 + 90 + 90 + 90) DAY)) as follow_up_4_visit_date_days_late
+    FROM vw_wra_baseline_visit_overview v1
+             LEFT JOIN vw_wra_fourth_fu_visit_overview v5 ON v1.record_id = v5.record_id
+    WHERE v1.record_id NOT IN (SELECT f1.record_id FROM vw_wra_first_fu_visit_overview f1)
+      AND v1.record_id NOT IN (SELECT f2.record_id FROM vw_wra_second_fu_visit_overview f2)
+      AND v1.record_id NOT IN (SELECT f3.record_id FROM vw_wra_third_fu_visit_overview f3)
+      AND v1.record_id NOT IN ((SELECT v5.record_id
+                                FROM vw_wra_fourth_fu_visit_overview v5))
+    UNION
+    SELECT v2.record_id,
+           v2.screening_id,
+           v2.wra_ptid,
+           COALESCE(v5.visit_date, v2.visit_date)                                       as last_visit_date,
+           DATE_ADD(v2.visit_date, INTERVAL ((90 + 21) + (90 + 21) + 90) DAY)           as follow_up_4_visit_date,
+           DATE_ADD(v2.visit_date, INTERVAL ((90 + 21) + (90 + 21) + (90 + 21))
+                    DAY)                                                                as follow_up_4_last_visit_date,
+           DATEDIFF(CURRENT_DATE,
+                    DATE_ADD(v2.visit_date, INTERVAL ((90 + 21) + (90 + 21) + 90) DAY)) as follow_up_4_visit_date_days_late
+    FROM vw_wra_first_fu_visit_overview v2
+             LEFT JOIN vw_wra_fourth_fu_visit_overview v5 ON v2.record_id = v5.record_id
+    WHERE v2.record_id NOT IN (SELECT f2.record_id FROM vw_wra_second_fu_visit_overview f2)
+      AND v2.record_id NOT IN (SELECT f3.record_id FROM vw_wra_third_fu_visit_overview f3)
+      AND v2.record_id NOT IN ((SELECT v5.record_id
+                                FROM vw_wra_fourth_fu_visit_overview v5))
+    UNION
+    SELECT v3.record_id,
+           v3.screening_id,
+           v3.wra_ptid,
+           COALESCE(v5.visit_date, v3.visit_date)                        as last_visit_date,
+           DATE_ADD(v3.visit_date, INTERVAL ((90 + 21) + 90) DAY)        as follow_up_4_visit_date,
+           DATE_ADD(v3.visit_date, INTERVAL ((90 + 21) + (90 + 21)) DAY) as follow_up_4_last_visit_date,
+           DATEDIFF(CURRENT_DATE,
+                    DATE_ADD(v3.visit_date, INTERVAL ((90 + 21) + 90)
+                             DAY))                                       as follow_up_4_visit_date_days_late
+    FROM vw_wra_second_fu_visit_overview v3
+             LEFT JOIN vw_wra_fourth_fu_visit_overview v5 ON v3.record_id = v5.record_id
+    WHERE v3.record_id NOT IN (SELECT f3.record_id FROM vw_wra_third_fu_visit_overview f3)
+      AND v3.record_id NOT IN (SELECT v5.record_id
+                               FROM vw_wra_fourth_fu_visit_overview v5)
+    UNION
+    SELECT v4.record_id,
+           v4.screening_id,
+           v4.wra_ptid,
+           COALESCE(v5.visit_date, v4.visit_date)                 as last_visit_date,
+           DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)           as follow_up_4_visit_date,
+           DATE_ADD(v4.visit_date, INTERVAL ((90 + 21)) DAY)      as follow_up_4_last_visit_date,
+           DATEDIFF(CURRENT_DATE,
+                    DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) as follow_up_4_visit_date_days_late
+    FROM vw_wra_third_fu_visit_overview v4
+             LEFT JOIN vw_wra_fourth_fu_visit_overview v5 ON v4.record_id = v5.record_id
+    WHERE v4.record_id NOT IN (SELECT v5.record_id
+                               FROM vw_wra_fourth_fu_visit_overview v5);
+
+    -- Total number of fourth follow-up visit due
+    SET @v_wra_fu_5_visits_due_total = (SELECT COUNT(DISTINCT f4.record_id)
+                                        FROM wra_fu_visit_4_overview f4
+                                        WHERE f4.follow_up_4_visit_date_days_late > 0
+                                          AND f4.follow_up_4_visit_date IS NOT NULL);
+
+    SET @v_wra_visit_5_remaining_total = (SELECT COUNT(DISTINCT f4.record_id)
+                                          FROM wra_fu_visit_4_overview f4
+                                          WHERE f4.follow_up_4_visit_date_days_late < 21
+                                            AND f4.record_id NOT IN
+                                                (SELECT v5.record_id FROM vw_wra_fourth_fu_visit_overview v5)
+                                            AND f4.follow_up_4_visit_date IS NOT NULL);
+
+    SET @v_wra_visit_5_ltfu = (SELECT COUNT(DISTINCT f4.record_id)
+                               FROM wra_fu_visit_4_overview f4
+                               WHERE f4.follow_up_4_visit_date_days_late > 21
+                                 AND f4.record_id NOT IN (SELECT DISTINCT f5o.record_id
+                                                          FROM vw_wra_fourth_fu_visit_overview f5o)
+                                 AND f4.follow_up_4_visit_date IS NOT NULL);
+
+    SET @v_wra_visit_5_screened = (SELECT COUNT(DISTINCT f4.record_id)
+                                   FROM vw_wra_fourth_fu_visit_overview f4
+                                   WHERE f4.visit_status <> '');
+
+    SET @v_wra_visit_5_screened_and_followed_up = (SELECT COUNT(DISTINCT f4.record_id)
+                                                   FROM vw_wra_fourth_fu_visit_overview f4
+                                                   WHERE f4.visit_status IN ('Available', 'Yes'));
+
+    SET @v_wra_visit_5_extended_absence = (SELECT COUNT(DISTINCT f4.record_id)
+                                           FROM vw_wra_fourth_fu_visit_overview f4
+                                           WHERE f4.visit_status IN ('Extended-Absence', 'No, Extended Absence'));
+
+    SET @v_wra_visit_5_untraceable = (SELECT COUNT(DISTINCT f4.record_id)
+                                      FROM vw_wra_fourth_fu_visit_overview f4
+                                      WHERE f4.visit_status = 'Untraceable');
+
+    SET @v_wra_visit_5_deferred = (SELECT COUNT(DISTINCT f4.record_id)
+                                   FROM vw_wra_fourth_fu_visit_overview f4
+                                   WHERE f4.visit_status = 'Deferred');
+
+    UPDATE crt_wra_retention ret
+    SET ret.wra_visit_missed_appointment = @v_wra_visit_5_ltfu,
+        ret.wra_visit_untraceable        = @v_wra_visit_5_untraceable,
+        ret.wra_visit_deferred           = @v_wra_visit_5_deferred,
+        ret.wra_visit_extended_absence   = @v_wra_visit_5_extended_absence,
+        ret.wra_screened                 = @v_wra_visit_5_screened,
+        ret.wra_screened_and_followed_up = @v_wra_visit_5_screened_and_followed_up,
+        ret.wra_visits_total             = @v_wra_fu_5_visits_due_total,
+        ret.wra_visit_total_remaining    = @v_wra_visit_5_remaining_total
+    WHERE ret.visit_number = 5.0;
+
     COMMIT;
     -- flag completion
     SELECT 1 as `status`;
