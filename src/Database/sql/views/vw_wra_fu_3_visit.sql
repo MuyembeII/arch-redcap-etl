@@ -14,7 +14,7 @@ SELECT v4.id,
        get_WRA_HH_Screening_ID(v4.record_id) as screening_id,
        v4.date_of_enrollment,
        v4.ra,
-       3.0                                   as visit_number,
+       4.0                                   as visit_number,
        v4.visit_date,
        CASE
            WHEN v4.is_wra_available = 1 AND v4.attempt_number < 3 THEN 'Available'

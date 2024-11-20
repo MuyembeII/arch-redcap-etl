@@ -109,8 +109,8 @@ FROM (SELECT v1.record_id,
                                                            'No, has migrated', 'Untraceable',
                                                            'Other {wra_fu_is_wra_avail_other_f4}'
                                      ))
-        AND DATEDIFF(CURRENT_DATE, DATE_ADD(v5.visit_date, INTERVAL ((90)) DAY)) > -21
-        AND DATEDIFF(CURRENT_DATE, DATE_ADD(v5.visit_date, INTERVAL ((90)) DAY)) <= 21) fu3
+        AND DATEDIFF(CURRENT_DATE, DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) > -21
+        AND DATEDIFF(CURRENT_DATE, DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) <= 21) fu3
 ORDER BY fu3.follow_up_4_visit_date_days_late;
 
 
