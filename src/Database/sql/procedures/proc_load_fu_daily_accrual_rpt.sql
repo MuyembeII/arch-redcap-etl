@@ -68,7 +68,16 @@ BEGIN
                                                v4.wra_fu_pp_avail_f3_label     as is_wra_available
                                         FROM wra_follow_up_visit_3_repeating_instruments v4
                                         WHERE v4.wra_fu_visit_date_f3 IS NOT NULL
-                                           OR v4.wra_fu_visit_date_f3 <> '') fu
+                                           OR v4.wra_fu_visit_date_f3 <> ''
+                                        UNION
+                                        SELECT v5.record_id,
+                                               v5.wra_fu_interviewer_obsloc_f4 as ra,
+                                               v5.wra_fu_visit_date_f4         as visit_date,
+                                               4.0                             as visit_number,
+                                               v5.wra_fu_pp_avail_f4_label     as is_wra_available
+                                        FROM wra_follow_up_visit_4_repeating_instruments v5
+                                        WHERE v5.wra_fu_visit_date_f4 IS NOT NULL
+                                           OR v5.wra_fu_visit_date_f4 <> '') fu
                                   WHERE fu.ra = p_ra_name
                                     AND fu.is_wra_available <> 'Yes'
                                     AND fu.visit_date = v_visit_date);
@@ -98,7 +107,16 @@ BEGIN
                                                             v4.wra_fu_pp_avail_f3_label     as is_wra_available
                                                      FROM wra_follow_up_visit_3_repeating_instruments v4
                                                      WHERE v4.wra_fu_visit_date_f3 IS NOT NULL
-                                                        OR v4.wra_fu_visit_date_f3 <> '') fu
+                                                        OR v4.wra_fu_visit_date_f3 <> ''
+                                                     UNION
+                                                     SELECT v5.record_id,
+                                                            v5.wra_fu_interviewer_obsloc_f4 as ra,
+                                                            v5.wra_fu_visit_date_f4         as visit_date,
+                                                            5.0                             as visit_number,
+                                                            v5.wra_fu_pp_avail_f4_label     as is_wra_available
+                                                     FROM wra_follow_up_visit_4_repeating_instruments v5
+                                                     WHERE v5.wra_fu_visit_date_f4 IS NOT NULL
+                                                        OR v5.wra_fu_visit_date_f4 <> '') fu
                                                WHERE fu.ra = p_ra_name
                                                  AND fu.is_wra_available = 'Yes'
                                                  AND fu.visit_date = v_visit_date);

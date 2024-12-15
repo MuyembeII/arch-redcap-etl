@@ -1,17 +1,12 @@
-/**
- * /----------------+___| List of WRA's due for the fourth follow-up visit (FU 4) |___+-----------------\
- *  Due to visits that are lost to follow-up(LTFU), a combined dataset of appointments from all
- *  previous visit will be of inclusion for scheduling.                                                 |*
- *                                                                                                      ^
- * @author : Gift Jr | Dowc | <muyembegift@gmail.com> | 12.11.24                                        |*
- * @since  : 0.0.1                                                                                      ):
- * @alias  : WRA Fourth FU Visit Due Schedule                                                            (;
-  \_______---______/--------------------------------------------------------------------\______---______/
- */
-CREATE OR REPLACE ALGORITHM = MERGE VIEW vw_wra_fourth_fu_schedule
-AS
--- Dateset 1: Baseline visit without any recorded appointment for 1st, 2nd and 3rd FU's.
-SELECT *
+SELECT fu4.record_id,
+       fu4.screening_id,
+       fu4.wra_ptid,
+       fu4.last_visit_date,
+       'Fourth Follow-Up'                   as visit_name,
+       fu4.attempt_number                   as attempts_completed,
+       fu4.follow_up_4_visit_date           as follow_up_visit_date,
+       fu4.follow_up_4_last_visit_date      as follow_up_last_visit_date,
+       fu4.follow_up_4_visit_date_days_late as follow_up_visit_date_days_late
 FROM (SELECT v1.record_id,
              v1.screening_id,
              v1.wra_ptid,
@@ -35,7 +30,6 @@ FROM (SELECT v1.record_id,
                                                             'No, has migrated', 'Untraceable',
                                                             'Other {wra_fu_is_wra_avail_other_f4}'
                                       )))
-        AND DATEDIFF(CURRENT_DATE, DATE_ADD(v1.screening_date, INTERVAL (90 + 90 + 90 + 90) DAY)) > -21
         AND DATEDIFF(CURRENT_DATE, DATE_ADD(v1.screening_date, INTERVAL (90 + 90 + 90 + 90) DAY)) <= 21
       UNION
 -- Dateset 2: 1st FU visits due for 4th FU appointment.
@@ -61,7 +55,6 @@ FROM (SELECT v1.record_id,
                                                             'No, has migrated', 'Untraceable',
                                                             'Other {wra_fu_is_wra_avail_other_f4}'
                                       )))
-        AND DATEDIFF(CURRENT_DATE, DATE_ADD(v2.visit_date, INTERVAL ((90) + (90) + 90) DAY)) > -21
         AND DATEDIFF(CURRENT_DATE, DATE_ADD(v2.visit_date, INTERVAL ((90) + (90) + 90) DAY)) <= 21
       UNION
 -- Dateset 3: 2nd FU visits due for 4th FU appointment.
@@ -86,7 +79,6 @@ FROM (SELECT v1.record_id,
                                                            'No, has migrated', 'Untraceable',
                                                            'Other {wra_fu_is_wra_avail_other_f4}'
                                      ))
-        AND DATEDIFF(CURRENT_DATE, DATE_ADD(v3.visit_date, INTERVAL (90 + 90) DAY)) > -21
         AND DATEDIFF(CURRENT_DATE, DATE_ADD(v3.visit_date, INTERVAL (90 + 90) DAY)) <= 21
       UNION
 -- Dateset 4: 3rd FU visits due for 4th FU appointment.
@@ -109,8 +101,6 @@ FROM (SELECT v1.record_id,
                                                            'No, has migrated', 'Untraceable',
                                                            'Other {wra_fu_is_wra_avail_other_f4}'
                                      ))
-        AND DATEDIFF(CURRENT_DATE, DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) > -21
-        AND DATEDIFF(CURRENT_DATE, DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) <= 21) fu3
-ORDER BY fu3.follow_up_4_visit_date_days_late;
-
-
+        AND DATEDIFF(CURRENT_DATE, DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) <= 21) fu4
+WHERE fu4.follow_up_4_visit_date < '2025-01-14'
+ORDER BY fu4.follow_up_4_visit_date_days_late;

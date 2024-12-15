@@ -63,3 +63,5 @@ composer.phar
 .idea/phpspec.xml
 .idea/redcap-etl.iml
 .idea/phpunit.xml
+.idea/dataSources.xml
+.idea/dataSources.xml
