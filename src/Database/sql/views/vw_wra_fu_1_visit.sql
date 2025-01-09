@@ -17,12 +17,15 @@ SELECT v2.id,
        2.0                                   as visit_number,
        v2.visit_date,
        CASE
-           WHEN v2.is_wra_available = 1 AND v2.attempt_number < 3 THEN 'Available'
+           WHEN v2.is_wra_available = 1 AND v2.attempt_number <= 3 THEN 'Available'
            WHEN v2.is_wra_available = 2 AND v2.attempt_number < 3 THEN 'Deferred'
            WHEN v2.is_wra_available = 2 AND v2.attempt_number = 3 THEN 'Untraceable'
-           WHEN v2.is_wra_available = 3 AND v2.attempt_number < 3 THEN 'Extended-Absence'
+           WHEN v2.is_wra_available = 3 AND v2.attempt_number <= 3 THEN 'Extended-Absence'
            WHEN v2.is_wra_available = 4 AND v2.attempt_number < 3 THEN 'Physical/Mental-Impairment'
-           WHEN v2.is_wra_available = 7 AND v2.attempt_number < 3 THEN 'Migrated'
+           WHEN v2.is_wra_available = 6 AND v2.attempt_number <= 3
+               THEN CONCAT_WS(' - ', 'Other', v2.is_wra_available_oth_label)
+           WHEN v2.is_wra_available = 7 AND v2.attempt_number <= 3 THEN 'Migrated'
+           WHEN v2.is_wra_available = 8 THEN 'Untraceable'
            ELSE v2.is_wra_available_label
            END                               as visit_status,
        v2.enrolled_in_zapps,
@@ -38,6 +41,7 @@ FROM (SELECT v2.root_id                                                         
              v1.screening_date                                                      as date_of_enrollment,
              v2.wra_fu_pp_avail                                                     as is_wra_available,
              v2.wra_fu_pp_avail_label                                               as is_wra_available_label,
+             v2.wra_fu_is_wra_avail_other                                           as is_wra_available_oth_label,
              v2.loc_fu_enrolled_zapps_label                                         as enrolled_in_zapps,
              v2.loc_fu_zapps_ptid                                                   as zapps_ptid
       FROM wra_follow_up_visit_repeating_instruments v2

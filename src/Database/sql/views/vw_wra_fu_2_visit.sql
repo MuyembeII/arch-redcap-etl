@@ -22,12 +22,14 @@ SELECT v3.id,
        3.0                                   as visit_number,
        v3.visit_date,
        CASE
-           WHEN v3.is_wra_available = 1 AND v3.attempt_number < 3 THEN 'Available'
+           WHEN v3.is_wra_available = 1 AND v3.attempt_number <= 3 THEN 'Available'
            WHEN v3.is_wra_available = 2 AND v3.attempt_number < 3 THEN 'Deferred'
            WHEN v3.is_wra_available = 2 AND v3.attempt_number = 3 THEN 'Untraceable'
-           WHEN v3.is_wra_available = 3 AND v3.attempt_number < 3 THEN 'Extended-Absence'
+           WHEN v3.is_wra_available = 3 AND v3.attempt_number <= 3 THEN 'Extended-Absence'
            WHEN v3.is_wra_available = 4 AND v3.attempt_number < 3 THEN 'Physical/Mental-Impairment'
-           WHEN v3.is_wra_available = 7 AND v3.attempt_number < 3 THEN 'Migrated'
+           WHEN v3.is_wra_available = 6 AND v3.attempt_number <= 3
+               THEN CONCAT_WS(' - ', 'Other', v3.is_wra_available_oth_label)
+           WHEN v3.is_wra_available = 7 AND v3.attempt_number <= 3 THEN 'Migrated'
            WHEN v3.is_wra_available = 8 THEN 'Untraceable'
            ELSE v3.is_wra_available_label
            END                               as visit_status,
@@ -44,6 +46,7 @@ FROM (SELECT v3.root_id                                                         
              v1.screening_date                                                      as date_of_enrollment,
              v3.wra_enr_pp_avail_f2                                                 as is_wra_available,
              v3.wra_enr_pp_avail_f2_label                                           as is_wra_available_label,
+             v3.wra_fu_is_wra_avail_other_f2                                        as is_wra_available_oth_label,
              v3.loc_fu_enrolled_zapps_f2_label                                      as enrolled_in_zapps,
              v3.loc_fu_zapps_ptid_f2                                                as zapps_ptid
       FROM wra_follow_up_visit_2_repeating_instruments v3 -- VISIT #3.0

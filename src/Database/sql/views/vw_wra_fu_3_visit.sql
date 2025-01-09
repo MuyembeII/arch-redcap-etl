@@ -17,12 +17,13 @@ SELECT v4.id,
        4.0                                   as visit_number,
        v4.visit_date,
        CASE
-           WHEN v4.is_wra_available = 1 AND v4.attempt_number < 3 THEN 'Available'
+           WHEN v4.is_wra_available = 1 AND v4.attempt_number <= 3 THEN 'Available'
            WHEN v4.is_wra_available = 2 AND v4.attempt_number < 3 THEN 'Deferred'
            WHEN v4.is_wra_available = 2 AND v4.attempt_number = 3 THEN 'Untraceable'
-           WHEN v4.is_wra_available = 3 AND v4.attempt_number < 3 THEN 'Extended-Absence'
+           WHEN v4.is_wra_available = 3 AND v4.attempt_number <= 3 THEN 'Extended-Absence'
            WHEN v4.is_wra_available = 4 AND v4.attempt_number < 3 THEN 'Physical/Mental-Impairment'
-           WHEN v4.is_wra_available = 7 AND v4.attempt_number < 3 THEN 'Migrated'
+           WHEN v4.is_wra_available = 6 AND v4.attempt_number <= 3 THEN CONCAT_WS(' - ', 'Other', v4.is_wra_available_oth_label)
+           WHEN v4.is_wra_available = 7 AND v4.attempt_number <= 3 THEN 'Migrated'
            WHEN v4.is_wra_available = 8 THEN 'Untraceable'
            ELSE v4.is_wra_available_label
            END                               as visit_status,
@@ -39,6 +40,7 @@ FROM (SELECT v4.root_id                                                         
              v1.screening_date                                                      as date_of_enrollment,
              v4.wra_fu_pp_avail_f3                                                  as is_wra_available,
              v4.wra_fu_pp_avail_f3_label                                            as is_wra_available_label,
+             v4.wra_fu_is_wra_avail_other_f3                                        as is_wra_available_oth_label,
              v4.loc_fu_enrolled_zapps_f3_label                                      as enrolled_in_zapps,
              v4.loc_fu_zapps_ptid_f3                                                as zapps_ptid
       FROM wra_follow_up_visit_3_repeating_instruments v4
