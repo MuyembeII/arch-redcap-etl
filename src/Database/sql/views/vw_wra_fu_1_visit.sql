@@ -17,8 +17,8 @@ SELECT v2.id,
        2.0                                   as visit_number,
        v2.visit_date,
        CASE
-           WHEN v2.is_wra_available = 1 AND v2.attempt_number <= 3 THEN 'Available'
-           WHEN v2.is_wra_available = 2 AND v2.attempt_number < 3 THEN 'Deferred'
+           WHEN v2.is_wra_available = 1 AND v2.attempt_number <= 3 THEN 'Completed'
+           WHEN v2.is_wra_available = 2 AND v2.attempt_number < 3 THEN 'Incomplete'
            WHEN v2.is_wra_available = 2 AND v2.attempt_number = 3 THEN 'Untraceable'
            WHEN v2.is_wra_available = 3 AND v2.attempt_number <= 3 THEN 'Extended-Absence'
            WHEN v2.is_wra_available = 4 AND v2.attempt_number < 3 THEN 'Physical/Mental-Impairment'

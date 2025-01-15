@@ -111,6 +111,6 @@ FROM (SELECT v1.record_id,
                                      ))
         AND DATEDIFF(CURRENT_DATE, DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) > -21
         AND DATEDIFF(CURRENT_DATE, DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) <= 21) fu3
-ORDER BY fu3.follow_up_4_visit_date_days_late;
+ORDER BY fu3.follow_up_4_visit_date_days_late DESC;
 
 
