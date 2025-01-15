@@ -110,7 +110,8 @@ FROM (SELECT v1.record_id,
                                                            'Other {wra_fu_is_wra_avail_other_f4}'
                                      ))
         AND DATEDIFF(CURRENT_DATE, DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) > -21
-        AND DATEDIFF(CURRENT_DATE, DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) <= 21) fu3
-ORDER BY fu3.follow_up_4_visit_date_days_late DESC;
+        AND DATEDIFF(CURRENT_DATE, DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) <= 21) fu4
+WHERE fu4.record_id NOT IN (SELECT sc.record_id FROM wra_study_closure sc)
+ORDER BY fu4.follow_up_4_visit_date_days_late DESC;
 
 
