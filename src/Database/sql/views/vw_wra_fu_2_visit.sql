@@ -16,10 +16,10 @@ SELECT v3.id,
        v3.record_id,
        v3.attempt_number,
        v3.wra_ptid,
-       get_WRA_HH_Screening_ID(v3.record_id) as screening_id,
+       COALESCE(v3.screening_id, get_WRA_HH_Screening_ID(v3.record_id)) as screening_id,
        v3.date_of_enrollment,
        v3.ra,
-       3.0                                   as visit_number,
+       3.0                                                              as visit_number,
        v3.visit_date,
        CASE
            WHEN v3.is_wra_available = 1 AND v3.attempt_number <= 3 THEN 'Completed'
@@ -32,7 +32,7 @@ SELECT v3.id,
            WHEN v3.is_wra_available = 7 AND v3.attempt_number <= 3 THEN 'Migrated'
            WHEN v3.is_wra_available = 8 THEN 'Untraceable'
            ELSE v3.is_wra_available_label
-           END                               as visit_status,
+           END                                                          as visit_status,
        v3.enrolled_in_zapps,
        v3.zapps_ptid
 FROM (SELECT v3.root_id                                                             as id,
@@ -43,6 +43,7 @@ FROM (SELECT v3.root_id                                                         
              v3.redcap_repeat_instance                                              as attempt_number,
              v3.wra_enr_interviewer_obsloc_f2                                       as ra,
              COALESCE(v1.wra_ptid, v3.wra_fu_wra_ptid_f2)                           as wra_ptid,
+             v3.hh_scrn_num_obsloc_f2                                               as screening_id,
              v1.screening_date                                                      as date_of_enrollment,
              v3.wra_enr_pp_avail_f2                                                 as is_wra_available,
              v3.wra_enr_pp_avail_f2_label                                           as is_wra_available_label,

@@ -17,8 +17,8 @@ CREATE unique INDEX crt_visits_wra_ptid_idx ON arch_etl_db.crt_visit_aggregates 
 
 INSERT INTO crt_visit_aggregates(record_id, screening_id, wra_ptid)
 SELECT v1.record_id, v1.screening_id, v1.wra_ptid
-FROM vw_wra_baseline_visit_overview v1
-ORDER BY v1.screening_id, v1.screening_date;
+FROM wra_overview v1
+ORDER BY v1.screening_id;
 
 -- FU1: Attempted Follow-Ups
 UPDATE crt_visit_aggregates v

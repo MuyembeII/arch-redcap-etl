@@ -11,10 +11,10 @@ SELECT v5.id,
        v5.record_id,
        v5.attempt_number,
        v5.wra_ptid,
-       get_WRA_HH_Screening_ID(v5.record_id) as screening_id,
+       COALESCE(v5.screening_id, get_WRA_HH_Screening_ID(v5.record_id)) as screening_id,
        v5.date_of_enrollment,
        v5.ra,
-       5.0                                   as visit_number,
+       5.0     as visit_number,
        v5.visit_date,
        CASE
            WHEN v5.is_wra_available = 1 AND v5.attempt_number <= 3 THEN 'Completed'
@@ -22,11 +22,12 @@ SELECT v5.id,
            WHEN v5.is_wra_available = 2 AND v5.attempt_number = 3 THEN 'Untraceable'
            WHEN v5.is_wra_available = 3 AND v5.attempt_number <= 3 THEN 'Extended-Absence'
            WHEN v5.is_wra_available = 4 AND v5.attempt_number < 3 THEN 'Physical/Mental-Impairment'
-           WHEN v5.is_wra_available = 6 AND v5.attempt_number <= 3 THEN CONCAT_WS(' - ', 'Other', v5.is_wra_available_oth_label)
+           WHEN v5.is_wra_available = 6 AND v5.attempt_number <= 3
+               THEN CONCAT_WS(' - ', 'Other', v5.is_wra_available_oth_label)
            WHEN v5.is_wra_available = 7 AND v5.attempt_number <= 3 THEN 'Migrated'
            WHEN v5.is_wra_available = 8 THEN 'Untraceable'
            ELSE v5.is_wra_available_label
-           END                               as visit_status,
+           END as visit_status,
        v5.enrolled_in_zapps,
        v5.zapps_ptid
 FROM (SELECT v5.root_id                                                             as id,
@@ -36,6 +37,7 @@ FROM (SELECT v5.root_id                                                         
              v5.wra_fu_visit_date_f4                                                as visit_date,
              v5.redcap_repeat_instance                                              as attempt_number,
              v5.wra_fu_interviewer_obsloc_f4                                        as ra,
+             v5.hh_scrn_num_obsloc_f4                                               as screening_id,
              COALESCE(v1.wra_ptid, v5.wra_fu_wra_ptid_f4)                           as wra_ptid,
              v1.screening_date                                                      as date_of_enrollment,
              v5.wra_fu_pp_avail_f4                                                  as is_wra_available,
