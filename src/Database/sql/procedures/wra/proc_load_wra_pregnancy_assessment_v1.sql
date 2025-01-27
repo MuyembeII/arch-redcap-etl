@@ -26,6 +26,7 @@ BEGIN
         END;
 
     START TRANSACTION;
+    TRUNCATE arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview;
     INSERT INTO arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview(record_id,
                                                                            wra_ptid,
                                                                            member_id,
@@ -45,6 +46,7 @@ BEGIN
            v1.visit_name,
            v1.visit_date
     FROM crt_wra_visit_1_overview v1
+    WHERE v1.record_id IN (SELECT DISTINCT a.record_id FROM wra_pregnancy_assessments a WHERE a.np_zapps_scorres IS NOT NULL)
     GROUP BY v1.visit_date, v1.screening_id
     ORDER BY v1.visit_date DESC;
 

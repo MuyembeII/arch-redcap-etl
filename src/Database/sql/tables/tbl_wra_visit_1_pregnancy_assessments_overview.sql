@@ -10,7 +10,7 @@ CREATE TABLE arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview
     visit_number                              DECIMAL(10, 1) NOT NULL,
     visit_name                                VARCHAR(64)    NOT NULL,
     visit_date                                DATE           NOT NULL,
-    pregnancy_id                              VARCHAR(12),
+    pregnancy_id                              VARCHAR(32),
     zapps_enrollment_status                   VARCHAR(32),
     zapps_ptid                                VARCHAR(16),
     zapps_ptid_source                         VARCHAR(16),
@@ -30,9 +30,9 @@ CREATE TABLE arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview
     preferred_zapps_clinic                    VARCHAR(32)
 );
 CREATE UNIQUE INDEX pa_1_wra_ptid_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (wra_ptid);
-CREATE UNIQUE INDEX pa_1_visit_number_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (visit_number);
-CREATE UNIQUE INDEX pa_1_visit_name_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (visit_name);
-CREATE UNIQUE INDEX pa_1_pregnancy_id_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (pregnancy_id);
-CREATE UNIQUE INDEX pa_1_pregnancy_identified_by_arch_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (pregnancy_identified_by_arch);
-CREATE UNIQUE INDEX pa_1_zapps_enrollment_status_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (zapps_enrollment_status);
-CREATE UNIQUE INDEX pa_1_zapps_referral_acceptance_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (zapps_referral_acceptance);
+CREATE INDEX pa_1_visit_number_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (visit_number);
+CREATE INDEX pa_1_visit_name_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (visit_name);
+CREATE INDEX pa_1_pregnancy_id_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (pregnancy_id);
+CREATE INDEX pa_1_pregnancy_identified_by_arch_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (pregnancy_identified_by_arch);
+CREATE INDEX pa_1_zapps_enrollment_status_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (zapps_enrollment_status);
+CREATE INDEX pa_1_zapps_referral_acceptance_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (zapps_referral_acceptance);
