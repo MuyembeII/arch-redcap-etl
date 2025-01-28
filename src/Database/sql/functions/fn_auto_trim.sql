@@ -15,7 +15,7 @@ CREATE FUNCTION useAutoTrimmer(p_txt TEXT)
 BEGIN
     DECLARE v_text TEXT;
     SET @text = REGEXP_REPLACE(p_txt, '^[\r\n ]*(.*)', '\\1'); -- removing whitespaces and newlines
-    SET v_text = REGEXP_REPLACE(@text, '\\\\s+', '  '); -- removing excessive internal spaces
+    SET v_text = REGEXP_REPLACE(@text, '[[:space:]]+', ' '); -- removing excessive internal spaces
     RETURN v_text;
 END $$
 

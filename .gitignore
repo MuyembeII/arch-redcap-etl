@@ -66,3 +66,4 @@ composer.phar
 .idea/dataSources.xml
 .idea/dataSources.xml
 .idea/phpunit.xml
+.idea/phpunit.xml
