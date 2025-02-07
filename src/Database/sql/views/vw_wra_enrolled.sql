@@ -44,7 +44,7 @@ FROM (SELECT wra_enr.root_id                                    as id,
              wra_enr.wra_age                                    as age,
              wra_enr.wra_enr_interviewer_obsloc                 as enrolled_by
       FROM wra_forms_repeating_instruments wra_enr
-      WHERE wra_enr.wra_age > 0) e
+      WHERE CAST(wra_enr.wra_age AS UNSIGNED ) > 0) e
 WHERE e.visit_id = 1
 ORDER BY e.screening_date DESC;
 
