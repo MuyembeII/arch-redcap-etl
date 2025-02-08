@@ -60,21 +60,21 @@ BEGIN
                WHEN v5.is_wra_available = 7 AND v5.attempt_number <= 3 THEN 'Migrated'
                ELSE v5.is_wra_available_label
                END       as visit_outcome
-    FROM (SELECT fu_4.wra_follow_up_visit_4_repeating_instruments_id                        as alternate_id,
+    FROM (SELECT fu_4.wra_follow_up_visit_4_repeating_instruments_id                               as alternate_id,
                  fu_4.record_id,
                  ROW_NUMBER() OVER (
-                     PARTITION BY fu_4.record_id ORDER BY fu_4.redcap_repeat_instance DESC) as visit_id,
-                 fu_4.wra_fu_visit_date_f4                                                  as visit_date,
-                 fu_4.hhe_hh_member_id_f4                                                   as member_id,
-                 fu_4.redcap_repeat_instance                                                as attempt_number,
-                 fu_4.redcap_event_name                                                     as visit_name,
-                 fu_4.wra_fu_interviewer_obsloc_f4                                          as ra,
-                 fu_4.wra_fu_wra_ptid_f4                                                    as wra_ptid,
-                 SUBSTRING(useIdTrimmer(fu_4.hh_scrn_num_obsloc_f4) FROM 1 FOR 14)          as screening_id,
-                 fu_4.wra_fu_pp_avail_f4                                                    as is_wra_available,
-                 fu_4.wra_fu_pp_avail_f4_label                                              as is_wra_available_label,
-                 fu_4.wra_fu_is_wra_avail_other_f4                                          as is_wra_available_oth_label,
-                 get_WRA_Age(fu_4.wra_fu_visit_date_f4, fu_4.record_id)                     as age
+                     PARTITION BY fu_4.record_id ORDER BY fu_4.redcap_repeat_instance DESC)        as visit_id,
+                 fu_4.wra_fu_visit_date_f4                                                         as visit_date,
+                 fu_4.hhe_hh_member_id_f4                                                          as member_id,
+                 COALESCE(CAST(fu_4.fu_attempt_count_f4 AS UNSIGNED), fu_4.redcap_repeat_instance) as attempt_number,
+                 fu_4.redcap_event_name                                                            as visit_name,
+                 fu_4.wra_fu_interviewer_obsloc_f4                                                 as ra,
+                 fu_4.wra_fu_wra_ptid_f4                                                           as wra_ptid,
+                 SUBSTRING(useIdTrimmer(fu_4.hh_scrn_num_obsloc_f4) FROM 1 FOR 14)                 as screening_id,
+                 fu_4.wra_fu_pp_avail_f4                                                           as is_wra_available,
+                 fu_4.wra_fu_pp_avail_f4_label                                                     as is_wra_available_label,
+                 fu_4.wra_fu_is_wra_avail_other_f4                                                 as is_wra_available_oth_label,
+                 get_WRA_Age(fu_4.wra_fu_visit_date_f4, fu_4.record_id)                            as age
           FROM wra_follow_up_visit_4_repeating_instruments fu_4
           WHERE fu_4.wra_fu_visit_date_f4 IS NOT NULL
              OR fu_4.hhe_hh_member_id_f4 IS NOT NULL) v5
