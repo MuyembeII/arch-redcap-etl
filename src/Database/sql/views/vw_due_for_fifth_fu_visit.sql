@@ -43,7 +43,8 @@ FROM (SELECT v1.record_id,
              v2.screening_id,
              v2.wra_ptid,
              COALESCE(v6.visit_date, v2.visit_date)                                            as last_visit_date,
-             0                                                                                 as attempt_number,
+             IF(v6.attempt_number IS NULL OR v6.attempt_number = '', 0,
+                v6.attempt_number)                                                             as attempt_number,
              DATE_ADD(v2.visit_date, INTERVAL (90 + 90 + 90 + 90) DAY)                         as follow_up_5_visit_date,
              DATE_ADD(v2.visit_date, INTERVAL ((90 + 90 + 90 + 90) + (90 + 21)) DAY)           as follow_up_5_last_visit_date,
              DATEDIFF(CURRENT_DATE, DATE_ADD(v2.visit_date, INTERVAL (90 + 90 + 90 + 90) DAY)) as days_late
@@ -118,16 +119,16 @@ FROM (SELECT v1.record_id,
              v5.wra_ptid,
              COALESCE(v6.visit_date, v5.visit_date)                                        as last_visit_date,
              IF(v6.attempt_number IS NULL OR v6.attempt_number = '', 0, v6.attempt_number) as attempt_number,
-             DATE_ADD(v5.visit_date, INTERVAL ((90)) DAY)                             as follow_up_5_visit_date,
-             DATE_ADD(v5.visit_date, INTERVAL ((90 + 21)) DAY)                        as follow_up_5_last_visit_date,
+             DATE_ADD(v5.visit_date, INTERVAL ((90)) DAY)                                  as follow_up_5_visit_date,
+             DATE_ADD(v5.visit_date, INTERVAL ((90 + 21)) DAY)                             as follow_up_5_last_visit_date,
              DATEDIFF(CURRENT_DATE,
-                      DATE_ADD(v5.visit_date, INTERVAL ((90)) DAY))                   as days_late
+                      DATE_ADD(v5.visit_date, INTERVAL ((90)) DAY))                        as days_late
       FROM vw_wra_fourth_fu_visit_overview v5
                LEFT JOIN vw_wra_fifth_fu_visit_overview v6 ON v5.record_id = v6.record_id
       WHERE v5.record_id NOT IN ((SELECT v5.record_id
                                   FROM vw_wra_fifth_fu_visit_overview v5
                                   WHERE v5.visit_status IN (
-                                                            'Yes', 'Available', 'Migrated', 'Extended-Absence',
+                                                            'Completed', 'Available', 'Migrated', 'Extended-Absence',
                                                             'No, Extended Absence', 'Physical/Mental-Impairment',
                                                             'No, has migrated', 'Untraceable',
                                                             'Other {wra_fu_is_wra_avail_other_f5}'
@@ -135,4 +136,12 @@ FROM (SELECT v1.record_id,
         AND DATEDIFF(CURRENT_DATE, DATE_ADD(v5.visit_date, INTERVAL ((90)) DAY)) >= -21
         AND DATEDIFF(CURRENT_DATE, DATE_ADD(v5.visit_date, INTERVAL ((90)) DAY)) <= 21) fu5
 WHERE fu5.record_id NOT IN (SELECT sc.record_id FROM wra_study_closure sc)
+AND fu5.record_id NOT IN (SELECT f5.record_id
+                          FROM vw_wra_fifth_fu_visit_overview f5
+                          WHERE f5.visit_status IN (
+                                                    'Completed', 'Available', 'Migrated', 'Extended-Absence',
+                                                    'No, Extended Absence', 'Physical/Mental-Impairment',
+                                                    'No, has migrated', 'Untraceable',
+                                                    'Other {wra_fu_is_wra_avail_other_f5}'
+                              ))
 ORDER BY fu5.days_late DESC;

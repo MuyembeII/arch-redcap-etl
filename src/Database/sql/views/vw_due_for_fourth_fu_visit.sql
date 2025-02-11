@@ -112,4 +112,12 @@ FROM (SELECT v1.record_id,
         AND DATEDIFF(CURRENT_DATE, DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) >= -21
         AND DATEDIFF(CURRENT_DATE, DATE_ADD(v4.visit_date, INTERVAL ((90)) DAY)) <= 21) fu4
 WHERE fu4.record_id NOT IN (SELECT sc.record_id FROM wra_study_closure sc)
+  AND fu4.record_id NOT IN (SELECT v5.record_id
+                            FROM vw_wra_fourth_fu_visit_overview v5
+                            WHERE v5.visit_status IN (
+                                                      'Completed', 'Available', 'Migrated', 'Extended-Absence',
+                                                      'No, Extended Absence', 'Physical/Mental-Impairment',
+                                                      'No, has migrated', 'Untraceable',
+                                                      'Other {wra_fu_is_wra_avail_other_f4}'
+                                ))
 ORDER BY fu4.follow_up_4_visit_date_days_late DESC;
