@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS arch_etl_db.crt_wra_point_of_collection_overview
 );
 CREATE INDEX poc_record_id_idx ON arch_etl_db.crt_wra_point_of_collection_overview (record_id);
 CREATE INDEX poc_wra_ptid_idx ON arch_etl_db.crt_wra_point_of_collection_overview (wra_ptid);
+CREATE UNIQUE INDEX poc_pregnancy_id_idx ON arch_etl_db.crt_wra_point_of_collection_overview (pregnancy_id);
 CREATE INDEX poc_upt_result_idx ON arch_etl_db.crt_wra_point_of_collection_overview (upt_result);
 CREATE INDEX poc_visit_number_idx ON arch_etl_db.crt_wra_point_of_collection_overview (visit_number);
 CREATE INDEX poc_visit_name_idx ON arch_etl_db.crt_wra_point_of_collection_overview (visit_name);
