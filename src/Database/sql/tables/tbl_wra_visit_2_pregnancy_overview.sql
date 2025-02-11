@@ -19,10 +19,14 @@ CREATE TABLE arch_etl_db.crt_wra_visit_2_pregnancy_overview
     pregnant_since_last_visit        ENUM ('No', 'Yes'),
     same_pregnancy_since_last_visit  ENUM ('No', 'Yes'),
     pregnancy_count_since_last_visit SMALLINT,
-    zapps_enrollment_status          VARCHAR(16)
+    zapps_enrollment_status          VARCHAR(16),
+    zapps_ptid                       VARCHAR(16)
 );
 CREATE UNIQUE INDEX visit_2_wra_ptid_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (wra_ptid);
 CREATE UNIQUE INDEX visit_2_visit_number_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (visit_number);
 CREATE UNIQUE INDEX visit_2_visit_name_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (visit_name);
 CREATE UNIQUE INDEX visit_2_previous_upt_result_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (previous_upt_result);
 CREATE UNIQUE INDEX visit_2_previous_pregnancy_id_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (previous_pregnancy_id);
+CREATE UNIQUE INDEX visit_2_pregnant_since_last_visit_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (pregnant_since_last_visit);
+CREATE UNIQUE INDEX visit_2_pregnancy_count_since_last_visit_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (pregnancy_count_since_last_visit);
+CREATE UNIQUE INDEX visit_2_zapps_enrollment_status_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (zapps_enrollment_status);
