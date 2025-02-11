@@ -45,6 +45,7 @@ BEGIN
            v1.visit_name,
            v1.visit_date
     FROM crt_wra_visit_1_overview v1
+    WHERE v1.visit_outcome = 'Completed'
     GROUP BY v1.visit_date, v1.screening_id
     ORDER BY v1.visit_date DESC;
 
