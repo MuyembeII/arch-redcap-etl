@@ -65,7 +65,7 @@ BEGIN
                  ROW_NUMBER() OVER (
                      PARTITION BY fu_4.record_id ORDER BY fu_4.redcap_repeat_instance DESC)        as visit_id,
                  fu_4.wra_fu_visit_date_f4                                                         as visit_date,
-                 fu_4.hhe_hh_member_id_f4                                                          as member_id,
+                 CAST(fu_4.hhe_hh_member_id_f4 AS UNSIGNED)                                        as member_id,
                  COALESCE(CAST(fu_4.fu_attempt_count_f4 AS UNSIGNED), fu_4.redcap_repeat_instance) as attempt_number,
                  fu_4.redcap_event_name                                                            as visit_name,
                  fu_4.wra_fu_interviewer_obsloc_f4                                                 as ra,
