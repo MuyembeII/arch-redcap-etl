@@ -25,6 +25,7 @@ BEGIN
         END;
 
     START TRANSACTION;
+    TRUNCATE arch_etl_db.crt_wra_point_of_collection_overview;
     INSERT INTO arch_etl_db.crt_wra_point_of_collection_overview(poc_id, record_id, wra_ptid, member_id, screening_id,
                                                                  visit_number, visit_name, visit_date,
                                                                  hx_of_hypertension, bp_systolic, bp_diastolic,
@@ -39,7 +40,7 @@ BEGIN
            wra.screening_id,
            v.visit_number,
            v.visit_alias                                                      as visit_name,
-           poc.poc_visit_date                                                 as visit_date,
+           COALESCE(poc.poc_visit_date, wra.visit_date)                       as visit_date,
            IF(poc.poc_hx_hypertension = 1, 'Yes',
               IF(poc.poc_hx_hypertension = 0, 'No', poc.poc_hx_hypertension)) as hx_of_hypertension,
            poc.bp_sys_vsorres                                                 as bp_systolic,
@@ -53,19 +54,27 @@ BEGIN
                ELSE 0
                END                                                               vaginal_swabs_collected,
            poc.upt_lborres_label                                              as upt_result,
-           poc.poc_preg_id_2                                                  as pregnancy_id,
+           (IF(poc.upt_lborres = 1, CONCAT_WS(
+                   '-', wra.wra_ptid, SUBSTR(COALESCE(poc.poc_visit_date, wra.visit_date), 1, 7)
+                                    ), NULL))                                 as pregnancy_id,
            poc.weight_peres                                                   as weight,
            poc.height_peres                                                   as height,
            poc.bmi,
            poc.anth_bmi_result                                                as bmi_result
     FROM wra_physical_exam_and_collection poc
-             INNER JOIN wra_overview wra ON poc.record_id = wra.record_id
-             INNER JOIN visit v ON poc.redcap_event_name = v.visit_name
+             INNER JOIN crt_wra_visit_1_overview wra ON poc.record_id = wra.record_id
+             LEFT JOIN visit v ON poc.redcap_event_name = v.visit_name
     WHERE poc.bp_vsstat IS NOT NULL;
     COMMIT;
 
-    -- flag completion
-    SELECT 'POC-Data loader completed successfully.' as `status`;
+    -- Operation Summary.
+    SELECT COUNT(IF(poc.visit_number = 1.0, 1, NULL)) as 'TX_VISIT_1',
+           COUNT(IF(poc.visit_number = 2.0, 1, NULL)) as 'TX_VISIT_2',
+           COUNT(IF(poc.visit_number = 3.0, 1, NULL)) as 'TX_VISIT_3',
+           COUNT(IF(poc.visit_number = 4.0, 1, NULL)) as 'TX_VISIT_4',
+           COUNT(IF(poc.visit_number = 5.0, 1, NULL)) as 'TX_VISIT_5',
+           COUNT(IF(poc.visit_number = 6.0, 1, NULL)) as 'TX_VISIT_6'
+    FROM crt_wra_point_of_collection_overview poc;
 
 END $$
 

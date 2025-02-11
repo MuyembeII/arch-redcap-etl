@@ -46,14 +46,17 @@ BEGIN
            v1.visit_name,
            v1.visit_date
     FROM crt_wra_visit_1_overview v1
-    WHERE v1.record_id IN (SELECT DISTINCT a.record_id FROM wra_pregnancy_assessments a WHERE a.np_zapps_scorres IS NOT NULL)
+    WHERE v1.record_id IN (SELECT DISTINCT a.record_id
+                           FROM wra_pregnancy_assessments a
+                           WHERE (a.np_zapps_scorres IS NOT NULL OR a.np_anc_mhyn IS NOT NULL) AND a.name_veri IS NOT NULL)
     GROUP BY v1.visit_date, v1.screening_id
     ORDER BY v1.visit_date DESC;
 
     UPDATE crt_wra_visit_1_pregnancy_assessments_overview v1
         LEFT JOIN wra_pregnancy_assessments pa ON v1.record_id = pa.record_id
+        LEFT JOIN crt_wra_point_of_collection_overview poc ON v1.record_id = poc.record_id
     SET v1.visit_date                                = COALESCE(pa.pa_visit_date, v1.visit_date),
-        v1.pregnancy_id                              = pa.wra_pregnancy_id,
+        v1.pregnancy_id                              = poc.pregnancy_id,
         v1.zapps_enrollment_status                   = pa.np_zapps_scorres_label,
         v1.zapps_ptid                                = useAutoTrimmer(pa.np_zapps_ptid),
         v1.zapps_ptid_source                         = pa.np_zapps_id_src_label,
@@ -63,7 +66,7 @@ BEGIN
                                                           IF(pa.np_anc_mhyn = 0, 'No', pa.np_anc_mhyn)),
         v1.anc_visit_count                           = CAST(pa.np_anc_num_mh AS UNSIGNED),
         v1.anc_attendance_plan                       = IF(pa.np_anc_plan_obsloc = 1, 'Yes',
-                                                          NULLIF(pa.np_anc_plan_obsloc, NULL)),
+                                                          IF(pa.np_anc_plan_obsloc = 0, 'No', pa.np_anc_plan_obsloc)),
         v1.planned_place_for_birth                   = (
             CASE
                 WHEN pa.birth_plan_fac_obsloc = 1 THEN pa.facility_other_label
@@ -81,18 +84,19 @@ BEGIN
                 END
             ),
         v1.alcoholic_consumption_during_pregnancy    = IF(pa.np_alc_suyn = 1, 'Yes',
-                                                          NULLIF(pa.np_alc_suyn, NULL)),
+                                                          IF(pa.np_alc_suyn = 0, 'No', pa.np_alc_suyn)),
         v1.alcoholic_consumption_frequency           = pa.np_alc_cons_label,
         v1.tobacco_consumption_during_pregnancy      = IF(pa.np_tob_suyn = 1, 'Yes',
-                                                          NULLIF(pa.np_tob_suyn, NULL)),
+                                                          IF(pa.np_tob_suyn = 0, 'No', pa.np_tob_suyn)),
         v1.tobacco_consumption_frequency             = pa.np_tob_cur_sudosfrq_label,
         v1.street_drugs_consumption_during_pregnancy = IF(pa.np_drug_suyn = 1, 'Yes',
-                                                          NULLIF(pa.np_drug_suyn, NULL)),
+                                                          IF(pa.np_drug_suyn = 0, 'No', pa.np_drug_suyn)),
         v1.street_drug_consumption_frequency         = pa.np_drug_usage_label,
         v1.zapps_referral_acceptance                 = IF(pa.ref_likely_scorres = 1, 'Yes',
-                                                          NULLIF(pa.ref_likely_scorres, NULL)),
+                                                          IF(pa.ref_likely_scorres = 0, 'No', pa.ref_likely_scorres)),
         v1.preferred_zapps_clinic                    = pa.pref_zapps_scorres_label
-    WHERE v1.record_id = pa.record_id;
+    WHERE v1.record_id = pa.record_id
+      AND poc.visit_number = v1.visit_number AND poc.upt_result = 'Positive';
     COMMIT;
 
     -- flag completion

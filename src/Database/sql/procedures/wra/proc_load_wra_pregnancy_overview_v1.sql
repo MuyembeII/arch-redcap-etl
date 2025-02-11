@@ -25,6 +25,7 @@ BEGIN
         END;
 
     START TRANSACTION;
+    TRUNCATE arch_etl_db.crt_wra_visit_1_pregnancy_overview;
     INSERT INTO arch_etl_db.crt_wra_visit_1_pregnancy_overview(record_id,
                                                                wra_ptid,
                                                                member_id,
@@ -53,7 +54,7 @@ BEGIN
                                                IF(pos_v1.ph_prev_rporres = 0, 'No', pos_v1.ph_prev_rporres)),
         v1.pregnancy_count                = pos_v1.pho_num_preg_rporres,
         v1.live_birth_count               = pos_v1.ph_live_rporres,
-        v1.loss_count                     = pos_v1.pho_loss_count,
+        v1.loss_count                     = pos_v1.ph_loss_rporres,
         v1.spontaneous_miscarriages_count = pos_v1.ph_bs_rporres,
         v1.still_birth_count              = pos_v1.stlb_num_rporres,
         v1.has_menstruals                 = IF(pos_v1.lmp_reg_scorres = 1, 'Yes',
