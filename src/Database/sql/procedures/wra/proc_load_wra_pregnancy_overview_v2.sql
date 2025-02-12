@@ -1,9 +1,9 @@
 /**
- * Load FU-2 WRA Pregnancy Surveillance.
+ * Load FU-1 WRA Pregnancy Surveillance.
  *
  * @author Gift Jr <muyembegift@gmail.com> | 26.01.25
  * @since 0.0.1
- * @alias Load WRA Pregnancy Surveillance FU-2
+ * @alias Load WRA Pregnancy Surveillance FU-1
  */
 DROP PROCEDURE IF EXISTS `Load_WRA_Pregnancy_Overview_V2`;
 
@@ -73,7 +73,7 @@ BEGIN
                                             IF(pa_v1.zapps_referral_acceptance = 'No', 'Not Accepted', NULL)),
         v2.zapps_enrollment_status = pa_v1.zapps_enrollment_status,
         v2.zapps_ptid              = pa_v1.zapps_ptid
-    WHERE poc.visit_number = 1.0;
+    WHERE poc.visit_number = 2.0;
 
     COMMIT;
 
