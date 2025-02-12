@@ -17,7 +17,7 @@ CREATE TABLE arch_etl_db.crt_wra_visit_2_pregnancy_assessments_overview
     pregnancy_identified_by_arch              ENUM ('No', 'Yes'),
     pregnancy_has_antenatal_care              ENUM ('No', 'Yes'),
     anc_visit_count                           TINYINT,
-    anc_attendance_plan                       ENUM ('No', 'Yes'),
+    anc_attendance_plan                       ENUM ('No', 'Yes', 'Don''t know', ''),
     planned_place_for_birth                   TINYTEXT,
     place_for_birth_planner                   TINYTEXT,
     alcoholic_consumption_during_pregnancy    ENUM ('No', 'Yes'),
@@ -29,7 +29,7 @@ CREATE TABLE arch_etl_db.crt_wra_visit_2_pregnancy_assessments_overview
     zapps_referral_acceptance                 ENUM ('No', 'Yes'),
     preferred_zapps_clinic                    VARCHAR(32)
 );
-CREATE UNIQUE INDEX pa_2_wra_ptid_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_assessments_overview (wra_ptid);
+CREATE INDEX pa_2_wra_ptid_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_assessments_overview (wra_ptid);
 CREATE INDEX pa_2_visit_number_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_assessments_overview (visit_number);
 CREATE INDEX pa_2_visit_name_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_assessments_overview (visit_name);
 CREATE INDEX pa_2_pregnancy_id_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_assessments_overview (pregnancy_id);

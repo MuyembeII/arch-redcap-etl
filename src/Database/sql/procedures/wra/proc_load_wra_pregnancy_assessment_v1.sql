@@ -1,5 +1,5 @@
 /**
- * Load FU-1 WRA Pregnancy Assessment.
+ * Load WRA Baseline Pregnancy Assessment.
  *
  * @author Gift Jr <muyembegift@gmail.com> | 26.01.25
  * @since 0.0.1
@@ -18,7 +18,7 @@ BEGIN
             ROLLBACK;
             GET DIAGNOSTICS CONDITION 1 @sqlstate = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;
             SET @full_error =
-                    CONCAT_WS('\n', 'ERROR - Failed to load FU-1 WRA Pregnancy Assessment Overview;', @errno, '(',
+                    CONCAT_WS('\n', 'ERROR - Failed to load WRA Pregnancy Assessment Overview;', @errno, '(',
                               @sqlstate, '):',
                               @text);
             SELECT @full_error;
