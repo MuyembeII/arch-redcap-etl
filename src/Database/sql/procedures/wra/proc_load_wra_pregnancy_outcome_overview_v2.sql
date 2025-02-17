@@ -5,10 +5,10 @@
  * @since 0.0.1
  * @alias Load WRA Pregnancy Outcome Assessments FU-2
  */
-DROP PROCEDURE IF EXISTS `Load_WRA_Pregnancy_Assessment_Overview_V2`;
+DROP PROCEDURE IF EXISTS `Load_WRA_Pregnancy_Outcome_Overview_V2`;
 
 DELIMITER $$
-CREATE PROCEDURE Load_WRA_Pregnancy_Assessment_Overview_V2()
+CREATE PROCEDURE Load_WRA_Pregnancy_Outcome_Overview_V2()
 BEGIN
     -- Smart-Simple safe-guard procedure for logging.
     DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING, NOT FOUND, 1062
