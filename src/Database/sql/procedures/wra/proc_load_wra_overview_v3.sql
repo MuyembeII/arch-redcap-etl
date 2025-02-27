@@ -55,6 +55,7 @@ BEGIN
            v3.visit_date,
            CASE
                WHEN v3.is_wra_available = 1 AND v3.attempt_number <= 3 THEN 'Completed'
+               WHEN v3.is_wra_available = 1 AND v3.attempt_number = 4 THEN 'Completed'
                WHEN v3.is_wra_available = 2 AND v3.attempt_number < 3 THEN 'Incomplete'
                WHEN ((v3.is_wra_available = 2 AND v3.attempt_number = 3) OR v3.is_wra_available = 8) THEN 'Untraceable'
                WHEN v3.is_wra_available = 3 AND v3.attempt_number <= 3 THEN 'Extended-Absence'
@@ -73,13 +74,14 @@ BEGIN
                  COALESCE(CAST(fu_2.attempt_count_f2 AS UNSIGNED), fu_2.redcap_repeat_instance) as attempt_number,
                  fu_2.redcap_event_name                                                         as visit_name,
                  fu_2.wra_enr_interviewer_obsloc_f2                                             as ra,
-                 fu_2.wra_fu_wra_ptid_f2                                                        as wra_ptid,
+                 IF(fu_2.wra_fu_wra_ptid_f2 = '', v1.wra_ptid, fu_2.wra_fu_wra_ptid_f2)         as wra_ptid,
                  SUBSTRING(useIdTrimmer(fu_2.hh_scrn_num_obsloc_f2) FROM 1 FOR 14)              as screening_id,
                  fu_2.wra_enr_pp_avail_f2                                                       as is_wra_available,
                  fu_2.wra_enr_pp_avail_f2_label                                                 as is_wra_available_label,
                  fu_2.wra_fu_is_wra_avail_other_f2                                              as is_wra_available_oth_label,
                  get_WRA_Age(fu_2.scrn_obsstdat_f2, fu_2.record_id)                             as age
           FROM wra_follow_up_visit_2_repeating_instruments fu_2
+                   LEFT JOIN crt_wra_visit_1_overview v1 ON v1.record_id = fu_2.record_id
           -- intentionally declaring this filter lazy to catch incomplete REDCap forms. Delete blank form from REDCap 
           WHERE fu_2.scrn_obsstdat_f2 IS NOT NULL
              OR fu_2.hhe_hh_member_id_f2 IS NOT NULL) v3

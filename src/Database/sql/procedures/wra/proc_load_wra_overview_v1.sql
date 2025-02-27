@@ -57,7 +57,10 @@ BEGIN
                      PARTITION BY wra_enr.record_id
                      ORDER BY wra_enr.redcap_repeat_instance DESC )                  as visit_id,
                  wra_enr.wra_forms_repeating_instruments_id                          as alternate_id,
-                 useAutoTrimmer(wra_enr.wra_ptid)                                    as wra_ptid,
+                 CONCAT(
+                         UCASE(LEFT(useAutoTrimmer(wra_enr.wra_ptid), 1)),
+                         SUBSTRING(wra_enr.wra_ptid, 2)
+                 )                                                                   as wra_ptid,
                  CAST(wra_enr.hhe_hh_member_id AS UNSIGNED)                          as member_id,
                  SUBSTRING(useAutoTrimmer(wra_enr.hh_scrn_num_obsloc) FROM 1 FOR 14) as screening_id,
                  wra_enr.scrn_obsstdat                                               as screening_date,

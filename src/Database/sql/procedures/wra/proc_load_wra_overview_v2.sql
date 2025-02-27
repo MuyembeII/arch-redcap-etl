@@ -31,7 +31,6 @@ BEGIN
 
     START TRANSACTION;
     TRUNCATE arch_etl_db.crt_wra_visit_2_overview;
-
     INSERT INTO arch_etl_db.crt_wra_visit_2_overview(record_id,
                                                      alternate_id,
                                                      wra_ptid,
@@ -69,11 +68,11 @@ BEGIN
                  ROW_NUMBER() OVER (
                      PARTITION BY fu_1.record_id ORDER BY fu_1.redcap_repeat_instance DESC)     as visit_id,
                  fu_1.wra_fu_visit_date                                                         as visit_date,
-                 v1.member_id                                     as member_id,
+                 v1.member_id                                                                   as member_id,
                  COALESCE(CAST(fu_1.fu_attempt_count AS UNSIGNED), fu_1.redcap_repeat_instance) as attempt_number,
                  fu_1.redcap_event_name                                                         as visit_name,
                  fu_1.wra_fu_interviewer_obsloc                                                 as ra,
-                 fu_1.wra_fu_wra_ptid                                                           as wra_ptid,
+                 IF(fu_1.wra_fu_wra_ptid = '', v1.wra_ptid, fu_1.wra_fu_wra_ptid)               as wra_ptid,
                  v1.screening_id                                                                as screening_id,
                  fu_1.wra_fu_pp_avail                                                           as is_wra_available,
                  fu_1.wra_fu_pp_avail_label                                                     as is_wra_available_label,
@@ -84,7 +83,8 @@ BEGIN
           -- intentionally declaring this filter lazy to catch incomplete REDCap forms. Delete blank form from REDCap 
           WHERE fu_1.wra_fu_visit_date IS NOT NULL) v2
              LEFT JOIN visit v ON v2.visit_name = v.visit_name
-    WHERE v2.visit_id = 1 AND (v2.screening_id <> '' OR v2.member_id <> '')
+    WHERE v2.visit_id = 1
+      AND (v2.screening_id <> '' OR v2.member_id <> '')
     ORDER BY v2.visit_date DESC;
     COMMIT;
 

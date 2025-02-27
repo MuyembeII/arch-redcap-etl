@@ -3,7 +3,7 @@ CREATE TABLE arch_etl_db.crt_wra_visit_6_overview
 (
     record_id     BIGINT         NOT NULL,
     alternate_id  BIGINT         NOT NULL,
-    wra_ptid      VARCHAR(6)     NULL,
+    wra_ptid      VARCHAR(6)     NOT NULL,
     member_id     SMALLINT       NOT NULL,
     screening_id  VARCHAR(14)    NOT NULL,
     age           SMALLINT       NOT NULL,

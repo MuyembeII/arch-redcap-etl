@@ -73,13 +73,14 @@ BEGIN
                  COALESCE(CAST(fu_5.fu_attempt_count_f5 AS UNSIGNED), fu_5.redcap_repeat_instance) as attempt_number,
                  fu_5.redcap_event_name                                                            as visit_name,
                  fu_5.wra_fu_interviewer_obsloc_f5                                                 as ra,
-                 fu_5.wra_fu_wra_ptid_f5                                                           as wra_ptid,
+                 IF(fu_5.wra_fu_wra_ptid_f5 = '', v1.wra_ptid, fu_5.wra_fu_wra_ptid_f5)       as wra_ptid,
                  SUBSTRING(useIdTrimmer(fu_5.hh_scrn_num_obsloc_f5) FROM 1 FOR 14)                 as screening_id,
                  fu_5.wra_fu_pp_avail_f5                                                           as is_wra_available,
                  fu_5.wra_fu_pp_avail_f5_label                                                     as is_wra_available_label,
                  fu_5.wra_fu_is_wra_avail_other_f5                                                 as is_wra_available_oth_label,
                  get_WRA_Age(fu_5.wra_fu_visit_date_f5, fu_5.record_id)                            as age
           FROM wra_follow_up_visit_5_repeating_instruments fu_5
+                   LEFT JOIN crt_wra_visit_1_overview v1 ON v1.record_id = fu_5.record_id
           -- intentionally declaring this filter lazy to catch incomplete REDCap forms. Delete blank form from REDCap 
           WHERE fu_5.wra_fu_visit_date_f5 IS NOT NULL
              OR fu_5.hhe_hh_member_id_f5 IS NOT NULL) v6
@@ -90,7 +91,7 @@ BEGIN
     COMMIT;
 
     -- flag completion
-    SELECT 'WRA-FU-4-Overview-Data loader completed successfully.' as `|_________________| Operation_Summary |_________________|`;
+    SELECT 'WRA-FU-5-Overview-Data loader completed successfully.' as `|_________________| Operation_Summary |_________________|`;
 
 END $$
 

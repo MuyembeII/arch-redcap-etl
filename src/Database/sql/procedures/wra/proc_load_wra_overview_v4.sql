@@ -69,13 +69,14 @@ BEGIN
                  COALESCE(CAST(fu_3.fu_attempt_count_f3 AS UNSIGNED), fu_3.redcap_repeat_instance) as attempt_number,
                  fu_3.redcap_event_name                                                            as visit_name,
                  fu_3.wra_fu_interviewer_obsloc_f3                                                 as ra,
-                 fu_3.wra_fu_wra_ptid_f3                                                           as wra_ptid,
+                 IF(fu_3.wra_fu_wra_ptid_f3 = '', v1.wra_ptid, fu_3.wra_fu_wra_ptid_f3)            as wra_ptid,
                  SUBSTRING(useIdTrimmer(fu_3.hh_scrn_num_obsloc_f3) FROM 1 FOR 14)                 as screening_id,
                  fu_3.wra_fu_pp_avail_f3                                                           as is_wra_available,
                  fu_3.wra_fu_pp_avail_f3_label                                                     as is_wra_available_label,
                  fu_3.wra_fu_is_wra_avail_other_f3                                                 as is_wra_available_oth_label,
                  get_WRA_Age(fu_3.wra_fu_visit_date_f3, fu_3.record_id)                            as age
           FROM wra_follow_up_visit_3_repeating_instruments fu_3
+                   LEFT JOIN crt_wra_visit_1_overview v1 ON v1.record_id = fu_3.record_id
           WHERE fu_3.wra_fu_visit_date_f3 IS NOT NULL
              OR fu_3.hhe_hh_member_id_f3 IS NOT NULL) v4
              LEFT JOIN visit v ON v4.visit_name = v.visit_name
