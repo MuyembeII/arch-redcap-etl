@@ -8,7 +8,7 @@
  * @param date End Date
  * @param varchar RA username
  */
-DROP PROCEDURE IF EXISTS `InitiateDailyAccrualData`;
+DROP PROCEDURE IF EXISTS `InitiateDailyFUAccrualData`;
 DELIMITER $$
 CREATE PROCEDURE InitiateDailyFUAccrualData(IN p_start_date DATE, IN p_end_date DATE, IN p_ra_name VARCHAR(64))
 BEGIN
@@ -29,6 +29,16 @@ BEGIN
             RESIGNAL;
         END;
 
+    DROP TEMPORARY TABLE IF EXISTS arch_etl_db.visits_overview;
+    CREATE TEMPORARY TABLE arch_etl_db.visits_overview
+    (
+        record_id     INT,
+        ra            VARCHAR(32),
+        visit_date    DATE,
+        visit_number  DECIMAL(10, 1) NOT NULL,
+        visit_outcome TINYTEXT
+    );
+
     /*Aggregates*/
     SET @v_wra_followed_up := 0;
     SET @v_wra_followed_up_and_screened := 0;
@@ -40,86 +50,70 @@ BEGIN
     END IF;
 
     START TRANSACTION;
+
+    INSERT INTO visits_overview(record_id, ra, visit_date, visit_number, visit_outcome)
+    SELECT o.record_id, o.ra, o.visit_date, o.visit_number, o.visit_outcome
+    FROM (SELECT v1.record_id,
+                 v1.ra,
+                 v1.visit_date,
+                 v1.visit_number,
+                 v1.visit_outcome
+          FROM crt_wra_visit_1_overview v1
+          UNION
+          SELECT v2.record_id,
+                 v2.ra,
+                 v2.visit_date,
+                 v2.visit_number,
+                 v2.visit_outcome
+          FROM crt_wra_visit_2_overview v2
+          UNION
+          SELECT v3.record_id,
+                 v3.ra,
+                 v3.visit_date,
+                 v3.visit_number,
+                 v3.visit_outcome
+          FROM crt_wra_visit_3_overview v3
+          UNION
+          SELECT v4.record_id,
+                 v4.ra,
+                 v4.visit_date,
+                 v4.visit_number,
+                 v4.visit_outcome
+          FROM crt_wra_visit_4_overview v4
+          UNION
+          SELECT v5.record_id,
+                 v5.ra,
+                 v5.visit_date,
+                 v5.visit_number,
+                 v5.visit_outcome
+          FROM crt_wra_visit_5_overview v5
+          UNION
+          SELECT v6.record_id,
+                 v6.ra,
+                 v6.visit_date,
+                 v6.visit_number,
+                 v6.visit_outcome
+          FROM crt_wra_visit_6_overview v6) o
+    ORDER BY o.visit_date DESC;
+
     REPEAT
 
-        SET @v_wra_followed_up = (SELECT COUNT(DISTINCT fu.record_id)
-                                  FROM (SELECT v2.record_id,
-                                               v2.wra_fu_interviewer_obsloc as ra,
-                                               v2.wra_fu_visit_date         as visit_date,
-                                               2.0                          as visit_number,
-                                               v2.wra_fu_pp_avail_label     as is_wra_available
-                                        FROM wra_follow_up_visit_repeating_instruments v2
-                                        WHERE v2.wra_fu_visit_date IS NOT NULL
-                                           OR v2.wra_fu_visit_date <> ''
-                                        UNION
-                                        SELECT v3.record_id,
-                                               v3.wra_enr_interviewer_obsloc_f2 as ra,
-                                               v3.scrn_obsstdat_f2              as visit_date,
-                                               3.0                              as visit_number,
-                                               v3.wra_enr_pp_avail_f2_label     as is_wra_available
-                                        FROM wra_follow_up_visit_2_repeating_instruments v3
-                                        WHERE v3.scrn_obsstdat_f2 IS NOT NULL
-                                           OR v3.scrn_obsstdat_f2 <> ''
-                                        UNION
-                                        SELECT v4.record_id,
-                                               v4.wra_fu_interviewer_obsloc_f3 as ra,
-                                               v4.wra_fu_visit_date_f3         as visit_date,
-                                               4.0                             as visit_number,
-                                               v4.wra_fu_pp_avail_f3_label     as is_wra_available
-                                        FROM wra_follow_up_visit_3_repeating_instruments v4
-                                        WHERE v4.wra_fu_visit_date_f3 IS NOT NULL
-                                           OR v4.wra_fu_visit_date_f3 <> ''
-                                        UNION
-                                        SELECT v5.record_id,
-                                               v5.wra_fu_interviewer_obsloc_f4 as ra,
-                                               v5.wra_fu_visit_date_f4         as visit_date,
-                                               4.0                             as visit_number,
-                                               v5.wra_fu_pp_avail_f4_label     as is_wra_available
-                                        FROM wra_follow_up_visit_4_repeating_instruments v5
-                                        WHERE v5.wra_fu_visit_date_f4 IS NOT NULL
-                                           OR v5.wra_fu_visit_date_f4 <> '') fu
-                                  WHERE fu.ra = p_ra_name
-                                    AND fu.is_wra_available <> 'Yes'
-                                    AND fu.visit_date = v_visit_date);
-        SET @v_wra_followed_up_and_screened = (SELECT COUNT(DISTINCT fu.record_id)
-                                               FROM (SELECT v2.record_id,
-                                                            v2.wra_fu_interviewer_obsloc as ra,
-                                                            v2.wra_fu_visit_date         as visit_date,
-                                                            2.0                          as visit_number,
-                                                            v2.wra_fu_pp_avail_label     as is_wra_available
-                                                     FROM wra_follow_up_visit_repeating_instruments v2
-                                                     WHERE v2.wra_fu_visit_date IS NOT NULL
-                                                        OR v2.wra_fu_visit_date <> ''
-                                                     UNION
-                                                     SELECT v3.record_id,
-                                                            v3.wra_enr_interviewer_obsloc_f2 as ra,
-                                                            v3.scrn_obsstdat_f2              as visit_date,
-                                                            3.0                              as visit_number,
-                                                            v3.wra_enr_pp_avail_f2_label     as is_wra_available
-                                                     FROM wra_follow_up_visit_2_repeating_instruments v3
-                                                     WHERE v3.scrn_obsstdat_f2 IS NOT NULL
-                                                        OR v3.scrn_obsstdat_f2 <> ''
-                                                     UNION
-                                                     SELECT v4.record_id,
-                                                            v4.wra_fu_interviewer_obsloc_f3 as ra,
-                                                            v4.wra_fu_visit_date_f3         as visit_date,
-                                                            4.0                             as visit_number,
-                                                            v4.wra_fu_pp_avail_f3_label     as is_wra_available
-                                                     FROM wra_follow_up_visit_3_repeating_instruments v4
-                                                     WHERE v4.wra_fu_visit_date_f3 IS NOT NULL
-                                                        OR v4.wra_fu_visit_date_f3 <> ''
-                                                     UNION
-                                                     SELECT v5.record_id,
-                                                            v5.wra_fu_interviewer_obsloc_f4 as ra,
-                                                            v5.wra_fu_visit_date_f4         as visit_date,
-                                                            5.0                             as visit_number,
-                                                            v5.wra_fu_pp_avail_f4_label     as is_wra_available
-                                                     FROM wra_follow_up_visit_4_repeating_instruments v5
-                                                     WHERE v5.wra_fu_visit_date_f4 IS NOT NULL
-                                                        OR v5.wra_fu_visit_date_f4 <> '') fu
-                                               WHERE fu.ra = p_ra_name
-                                                 AND fu.is_wra_available = 'Yes'
-                                                 AND fu.visit_date = v_visit_date);
+        SET @v_wra_followed_up = (SELECT COUNT(DISTINCT v.record_id)
+                                  FROM visits_overview v
+                                  WHERE v.ra = p_ra_name
+                                    AND v.visit_outcome IN (
+                                                            'Migrated',
+                                                            'Untraceable',
+                                                            'Extended-Absence',
+                                                            'Incomplete'
+                                      )
+                                    AND v.visit_date = v_visit_date);
+
+        SET @v_wra_followed_up_and_screened = (SELECT COUNT(DISTINCT v.record_id)
+                                               FROM visits_overview v
+                                               WHERE v.ra = p_ra_name
+                                                 AND v.visit_outcome IN ('Completed', 'Enrolled')
+                                                 AND v.visit_date = v_visit_date);
 
         INSERT INTO crt_ra_fu_accrual(ra_name, date, wra_followed_up, wra_followed_up_and_screened)
         VALUES (p_ra_name, v_visit_date, @v_wra_followed_up, @v_wra_followed_up_and_screened);
