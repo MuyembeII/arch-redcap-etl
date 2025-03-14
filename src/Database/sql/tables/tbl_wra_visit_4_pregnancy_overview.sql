@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS arch_etl_db.crt_wra_visit_3_pregnancy_overview;
-CREATE TABLE arch_etl_db.crt_wra_visit_3_pregnancy_overview
+DROP TABLE IF EXISTS arch_etl_db.crt_wra_visit_4_pregnancy_overview;
+CREATE TABLE arch_etl_db.crt_wra_visit_4_pregnancy_overview
 (
     record_id                        INT            NOT NULL PRIMARY KEY,
     wra_ptid                         VARCHAR(6)     NOT NULL,
@@ -23,12 +23,12 @@ CREATE TABLE arch_etl_db.crt_wra_visit_3_pregnancy_overview
     zapps_enrollment_status          VARCHAR(32),
     zapps_ptid                       VARCHAR(16)
 );
-CREATE INDEX visit_3_wra_ptid_idx ON arch_etl_db.crt_wra_visit_3_pregnancy_overview (wra_ptid);
-CREATE INDEX visit_3_currently_pregnant_idx ON arch_etl_db.crt_wra_visit_3_pregnancy_overview (currently_pregnant);
-CREATE INDEX visit_3_pregnancy_identifier_idx ON arch_etl_db.crt_wra_visit_3_pregnancy_overview (pregnancy_identifier);
-CREATE INDEX visit_3_last_upt_result_idx ON arch_etl_db.crt_wra_visit_3_pregnancy_overview (last_upt_result);
-CREATE UNIQUE INDEX visit_3_last_pregnancy_id_idx ON arch_etl_db.crt_wra_visit_3_pregnancy_overview (last_pregnancy_id);
-CREATE INDEX visit_3_last_zapps_referral_outcome_idx ON arch_etl_db.crt_wra_visit_3_pregnancy_overview (last_zapps_referral_outcome);
-CREATE INDEX visit_3_pregnant_since_last_visit_idx ON arch_etl_db.crt_wra_visit_3_pregnancy_overview (pregnant_since_last_visit);
-CREATE INDEX visit_3_pregnancy_count_since_last_visit_idx ON arch_etl_db.crt_wra_visit_3_pregnancy_overview (pregnancy_count_since_last_visit);
-CREATE INDEX visit_3_zapps_enrollment_status_idx ON arch_etl_db.crt_wra_visit_3_pregnancy_overview (zapps_enrollment_status);
+CREATE INDEX visit_4_wra_ptid_idx ON arch_etl_db.crt_wra_visit_4_pregnancy_overview (wra_ptid);
+CREATE INDEX visit_4_currently_pregnant_idx ON arch_etl_db.crt_wra_visit_4_pregnancy_overview (currently_pregnant);
+CREATE INDEX visit_4_pregnancy_identifier_idx ON arch_etl_db.crt_wra_visit_4_pregnancy_overview (pregnancy_identifier);
+CREATE INDEX visit_4_last_upt_result_idx ON arch_etl_db.crt_wra_visit_4_pregnancy_overview (last_upt_result);
+CREATE UNIQUE INDEX visit_4_last_pregnancy_id_idx ON arch_etl_db.crt_wra_visit_4_pregnancy_overview (last_pregnancy_id);
+CREATE INDEX visit_4_last_zapps_referral_outcome_idx ON arch_etl_db.crt_wra_visit_4_pregnancy_overview (last_zapps_referral_outcome);
+CREATE INDEX visit_4_pregnant_since_last_visit_idx ON arch_etl_db.crt_wra_visit_4_pregnancy_overview (pregnant_since_last_visit);
+CREATE INDEX visit_4_pregnancy_count_since_last_visit_idx ON arch_etl_db.crt_wra_visit_4_pregnancy_overview (pregnancy_count_since_last_visit);
+CREATE INDEX visit_4_zapps_enrollment_status_idx ON arch_etl_db.crt_wra_visit_4_pregnancy_overview (zapps_enrollment_status);

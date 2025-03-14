@@ -23,8 +23,12 @@ BEGIN
             SELECT @full_error;
             RESIGNAL;
         END;
+    -- Op matrices
+    SET @v_tx_pre_po_v1 := 0; -- Initial count
+    SET @v_tx_pro_po_v1 := 0; -- After count
 
     START TRANSACTION;
+    SET @v_tx_pre_po_v1 = (SELECT COUNT(pos.root_id) FROM wra_pregnancy_overview_and_surveillance pos);
     TRUNCATE arch_etl_db.crt_wra_visit_1_pregnancy_overview;
     INSERT INTO arch_etl_db.crt_wra_visit_1_pregnancy_overview(record_id,
                                                                wra_ptid,
@@ -45,9 +49,7 @@ BEGIN
            v1.visit_name,
            v1.visit_date
     FROM crt_wra_visit_1_overview v1
-    WHERE v1.visit_outcome = 'Completed'
-    GROUP BY v1.visit_date, v1.screening_id
-    ORDER BY v1.visit_date DESC;
+    ORDER BY v1.visit_date, v1.screening_id DESC;
 
     UPDATE crt_wra_visit_1_pregnancy_overview v1
         LEFT JOIN wra_pregnancy_overview_and_surveillance pos_v1 ON v1.record_id = pos_v1.record_id
@@ -58,8 +60,9 @@ BEGIN
         v1.loss_count                     = pos_v1.ph_loss_rporres,
         v1.spontaneous_miscarriages_count = pos_v1.ph_bs_rporres,
         v1.still_birth_count              = pos_v1.stlb_num_rporres,
-        v1.has_menstruals                 = IF(pos_v1.lmp_reg_scorres = 1, 'Yes',
-                                               IF(pos_v1.lmp_reg_scorres = 0, 'No', pos_v1.lmp_reg_scorres)),
+        v1.menstruation_outcome           = IF(pos_v1.lmp_reg_scorres = 1, 'Menstruating',
+                                               IF(pos_v1.lmp_reg_scorres = 0, 'Not Menstruating',
+                                                  pos_v1.lmp_reg_scorres)),
         v1.no_menstruals_reason           = IF(pos_v1.lmp_kd_scorres = 96,
                                                CONCAT_WS(' - ', 'Other', pos_v1.lmp_kd_scorres_other),
                                                pos_v1.lmp_kd_scorres_label),
@@ -68,8 +71,11 @@ BEGIN
     WHERE v1.record_id = pos_v1.record_id;
     COMMIT;
 
-    -- flag completion
-    SELECT 'Pregnancy-Surv-Data loader completed successfully.' as `status`;
+    -- Process Metrics
+    SET @v_tx_pro_po_v1 = (SELECT COUNT(po_v1.record_id) FROM crt_wra_visit_1_pregnancy_overview po_v1);
+    SET @v_load_metrics = CONCAT_WS(' of ', @v_tx_pro_po_v1, @v_tx_pre_po_v1);
+    SET @v_load_info = CONCAT('WRA-Pregnancy-Overview-&-Surveillance-V1-Data: LOADING COMPLETE. ', @v_load_metrics);
+    SELECT @v_load_info as `|_________________| Operation_Summary |_________________|`;
 
 END $$
 

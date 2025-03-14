@@ -8,9 +8,9 @@ CREATE TABLE arch_etl_db.crt_wra_visit_2_pregnancy_overview
     age                              SMALLINT       NOT NULL,
     ra                               VARCHAR(32)    NOT NULL,
     visit_number                     DECIMAL(10, 1) NOT NULL,
-    visit_name                       VARCHAR(255)   NOT NULL,
+    visit_name                       VARCHAR(64)    NOT NULL,
     visit_date                       DATE           NOT NULL,
-    has_menstruals                   ENUM ('No', 'Yes'),
+    menstruation_outcome             ENUM ('Menstruating', 'Not Menstruating'),
     no_menstruals_reason             TINYTEXT,
     currently_pregnant               VARCHAR(8),
     pregnancy_identifier             TINYTEXT,
@@ -24,8 +24,8 @@ CREATE TABLE arch_etl_db.crt_wra_visit_2_pregnancy_overview
     zapps_ptid                       VARCHAR(16)
 );
 CREATE INDEX visit_2_wra_ptid_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (wra_ptid);
-CREATE INDEX visit_2_visit_number_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (visit_number);
-CREATE INDEX visit_2_visit_name_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (visit_name);
+CREATE INDEX visit_2_currently_pregnant_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (currently_pregnant);
+CREATE INDEX visit_2_pregnancy_identifier_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (pregnancy_identifier);
 CREATE INDEX visit_2_last_upt_result_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (last_upt_result);
 CREATE UNIQUE INDEX visit_2_last_pregnancy_id_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (last_pregnancy_id);
 CREATE INDEX visit_2_last_zapps_referral_outcome_idx ON arch_etl_db.crt_wra_visit_2_pregnancy_overview (last_zapps_referral_outcome);
