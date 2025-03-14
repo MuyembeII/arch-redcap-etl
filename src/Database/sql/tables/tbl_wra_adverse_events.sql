@@ -39,4 +39,6 @@ CREATE INDEX ae_is_serious_adverse_event_idx ON arch_etl_db.crt_wra_adverse_even
 CREATE INDEX ae_is_serious_adverse_event_type_idx ON arch_etl_db.crt_wra_adverse_events (serious_adverse_event_type);
 CREATE INDEX ae_medical_attention_seeked_by_wra_idx ON arch_etl_db.crt_wra_adverse_events (medical_attention_seeked_by_wra);
 CREATE INDEX ae_study_related_adverse_event_idx ON arch_etl_db.crt_wra_adverse_events (study_related_adverse_event);
-
+CREATE INDEX ae_outcome_of_sae_idx ON arch_etl_db.crt_wra_adverse_events (outcome_of_sae);
+CREATE FULLTEXT INDEX ae_ft_idx ON crt_wra_adverse_events (primary_adverse_event,
+                                                           outcome_of_sae);

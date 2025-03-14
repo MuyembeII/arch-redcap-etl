@@ -9,8 +9,8 @@ CREATE OR REPLACE ALGORITHM = MERGE VIEW vw_wra_consent_overview
 AS
 WITH wra_fu_1_consent AS
          (SELECT v2.*,
-                 IF(f1.wra_fu_conf_consent = 1, 'Yes',
-                    IF(f1.wra_fu_conf_consent = 0, 'No', f1.wra_fu_conf_consent)) as ongoing_consent_confirmed,
+                 IF(f1.wra_fu_conf_consent = 1, 'Accepted',
+                    IF(f1.wra_fu_conf_consent = 0, 'Declined', f1.wra_fu_conf_consent)) as ongoing_consent_outcome,
                  IF(f1.wra_fu_reas_decline_const = 4,
                     CONCAT_WS(' - ', 'Other', f1.fu_reason_decline_other),
                     f1.wra_fu_reas_decline_const_label)                           as consent_declined_reason
@@ -22,8 +22,8 @@ WITH wra_fu_1_consent AS
           ORDER BY v2.visit_date DESC),
      wra_fu_2_consent AS
          (SELECT v3.*,
-                 IF(f2.wra_fu_conf_consent_f2 = 1, 'Yes',
-                    IF(f2.wra_fu_conf_consent_f2 = 0, 'No', f2.wra_fu_conf_consent_f2)) as ongoing_consent_confirmed,
+                 IF(f2.wra_fu_conf_consent_f2 = 1, 'Accepted',
+                    IF(f2.wra_fu_conf_consent_f2 = 0, 'Declined', f2.wra_fu_conf_consent_f2)) as ongoing_consent_outcome,
                  IF(f2.wra_fu_reas_decline_f2 = 4,
                     CONCAT_WS(' - ', 'Other', f2.fu_reason_decline_other_f2),
                     f2.wra_fu_reas_decline_f2_label)                                    as consent_declined_reason
@@ -35,8 +35,8 @@ WITH wra_fu_1_consent AS
           ORDER BY v3.visit_date DESC),
      wra_fu_3_consent AS
          (SELECT v4.*,
-                 IF(f3.wra_fu_conf_consent_f3 = 1, 'Yes',
-                    IF(f3.wra_fu_conf_consent_f3 = 0, 'No', f3.wra_fu_conf_consent_f3)) as ongoing_consent_confirmed,
+                 IF(f3.wra_fu_conf_consent_f3 = 1, 'Accepted',
+                    IF(f3.wra_fu_conf_consent_f3 = 0, 'Declined', f3.wra_fu_conf_consent_f3)) as ongoing_consent_outcome,
                  IF(f3.wra_fu_reas_decline_const_f3 = 4,
                     CONCAT_WS(' - ', 'Other', f3.fu_reason_decline_other_f3),
                     f3.wra_fu_reas_decline_const_f3_label)                              as consent_declined_reason
@@ -48,8 +48,8 @@ WITH wra_fu_1_consent AS
           ORDER BY v4.visit_date DESC),
      wra_fu_4_consent AS
          (SELECT v5.*,
-                 IF(f4.wra_fu_conf_consent_f4 = 1, 'Yes',
-                    IF(f4.wra_fu_conf_consent_f4 = 0, 'No', f4.wra_fu_conf_consent_f4)) as ongoing_consent_confirmed,
+                 IF(f4.wra_fu_conf_consent_f4 = 1, 'Accepted',
+                    IF(f4.wra_fu_conf_consent_f4 = 0, 'Declined', f4.wra_fu_conf_consent_f4)) as ongoing_consent_outcome,
                  IF(f4.wra_fu_reas_decline_const_f4 = 4,
                     CONCAT_WS(' - ', 'Other', f4.fu_reason_decline_other_f4),
                     f4.wra_fu_reas_decline_const_f4_label)                              as consent_declined_reason
@@ -61,8 +61,8 @@ WITH wra_fu_1_consent AS
           ORDER BY v5.visit_date DESC),
      wra_fu_5_consent AS
          (SELECT v6.*,
-                 IF(f5.wra_fu_conf_consent_f5 = 1, 'Yes',
-                    IF(f5.wra_fu_conf_consent_f5 = 0, 'No', f5.wra_fu_conf_consent_f5)) as ongoing_consent_confirmed,
+                 IF(f5.wra_fu_conf_consent_f5 = 1, 'Accepted',
+                    IF(f5.wra_fu_conf_consent_f5 = 0, 'Declined', f5.wra_fu_conf_consent_f5)) as ongoing_consent_outcome,
                  IF(f5.wra_fu_reas_decline_const_f5 = 4,
                     CONCAT_WS(' - ', 'Other', f5.fu_reason_decline_other_f5),
                     f5.wra_fu_reas_decline_const_f5_label)                              as consent_declined_reason

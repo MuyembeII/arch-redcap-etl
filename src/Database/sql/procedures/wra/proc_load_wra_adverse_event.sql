@@ -18,10 +18,10 @@ BEGIN
             ROLLBACK;
             GET DIAGNOSTICS CONDITION 1 @sqlstate = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;
             SET @full_error =
-                    CONCAT_WS('\n', 'ERROR - Failed to load WRA SAE;', @errno, '(',
+                    CONCAT_WS('\n', 'ERROR - Failed to load CRT-WRA SAE;', @errno, '(',
                               @sqlstate, '):',
                               @text);
-            SELECT @full_error as Error_Details;
+            SELECT @full_error as Operation_Error_Details;
             RESIGNAL;
         END;
     SET @v_tx_pre_sae := 0; -- Initial count
