@@ -3,7 +3,7 @@
  *
  * @author Gift Jr <muyembegift@gmail.com> | 26.01.25
  * @since 0.0.1
- * @alias Load WRA Pregnancy Assessment FU-1
+ * @alias Load WRA Pregnancy Assessment Baseline
  */
 DROP PROCEDURE IF EXISTS `Load_WRA_Pregnancy_Assessment_Overview_V1`;
 
@@ -24,9 +24,13 @@ BEGIN
             SELECT @full_error;
             RESIGNAL;
         END;
+    -- Op matrices
+    SET @v_tx_pre_pa_v1 := 0; -- Initial count
+    SET @v_tx_pro_pa_v1 := 0; -- After count
 
     START TRANSACTION;
     TRUNCATE arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview;
+    SET @v_tx_pre_pa_v1 = (SELECT COUNT(pa.root_id) FROM wra_pregnancy_assessments pa);
     INSERT INTO arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview(record_id,
                                                                            wra_ptid,
                                                                            member_id,
@@ -49,7 +53,6 @@ BEGIN
     WHERE v1.record_id IN (SELECT DISTINCT a.record_id
                            FROM wra_pregnancy_assessments a
                            WHERE (a.np_zapps_scorres IS NOT NULL OR a.np_anc_mhyn IS NOT NULL) AND a.name_veri IS NOT NULL)
-    GROUP BY v1.visit_date, v1.screening_id
     ORDER BY v1.visit_date DESC;
 
     UPDATE crt_wra_visit_1_pregnancy_assessments_overview v1
@@ -99,8 +102,11 @@ BEGIN
       AND poc.visit_number = v1.visit_number AND poc.upt_result = 'Positive';
     COMMIT;
 
-    -- flag completion
-    SELECT 'Pregnancy-Assessment-Data loader completed successfully.' as `status`;
+    -- Process Metrics
+    SET @v_tx_pro_pa_v1 = (SELECT COUNT(pa_v1.record_id) FROM crt_wra_visit_1_pregnancy_assessments_overview pa_v1);
+    SET @v_load_metrics = CONCAT_WS(' of ', @v_tx_pro_pa_v1, @v_tx_pre_pa_v1);
+    SET @v_load_info = CONCAT('WRA-Pregnancy-Assessment-V1-Data: LOADING COMPLETE. ', @v_load_metrics);
+    SELECT @v_load_info as `|_________________| Operation_Summary |_________________|`;
 
 END $$
 

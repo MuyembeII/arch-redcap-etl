@@ -91,7 +91,7 @@ BEGIN
     COMMIT;
 
     -- flag completion
-    SELECT 'WRA-FU-5-Overview-Data loader completed successfully.' as `|_________________| Operation_Summary |_________________|`;
+    SELECT 'WRA-FU-6-Overview-Data loader completed successfully.' as `|_________________| Operation_Summary |_________________|`;
 
 END $$
 

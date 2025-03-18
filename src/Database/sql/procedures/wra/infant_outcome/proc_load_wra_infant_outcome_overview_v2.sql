@@ -24,9 +24,13 @@ BEGIN
             SELECT @full_error;
             RESIGNAL;
         END;
+    -- Op matrices
+    SET @v_tx_pre_ioa_v2 := 0; -- Initial count
+    SET @v_tx_pro_ioa_v2 := 0; -- After count
 
     START TRANSACTION;
     TRUNCATE arch_etl_db.crt_wra_visit_2_infant_outcome_overview;
+    SET @v_tx_pre_ioa_v2 = (SELECT COUNT(io.root_id) FROM infant_outcome_assessment_repeating_instruments io);
     INSERT INTO arch_etl_db.crt_wra_visit_2_infant_outcome_overview(alternate_id,
                                                                     infant_id,
                                                                     record_id,
@@ -63,7 +67,7 @@ BEGIN
            CASE
                WHEN v2.infant_mortality_outcome = 0 THEN 'Deceased'
                WHEN v2.infant_mortality_outcome = 1 THEN 'Living'
-               END              as infant_mortality_outcome,
+               END                          as infant_mortality_outcome,
            v2.infant_living_age_days,
            v2.infant_living_age_months,
            v2.infant_deceased_age_days,
@@ -96,15 +100,17 @@ BEGIN
     ORDER BY v2.visit_date DESC;
 
     UPDATE crt_wra_visit_2_infant_outcome_overview v2
-        LEFT JOIN crt_wra_visit_1_pregnancy_assessments_overview pa_v1 ON v2.record_id = pa_v1.record_id
         LEFT JOIN crt_wra_point_of_collection_overview poc ON v2.record_id = poc.record_id
     SET v2.last_upt_result   = poc.upt_result,
         v2.last_pregnancy_id = poc.pregnancy_id
-    WHERE poc.visit_number = 1.0; -- filter by previous POC visit
+    WHERE poc.visit_number = (v2.visit_number - 1); -- filter by all previous POC visits
     COMMIT;
 
-    -- flag completion
-    SELECT 'FU-1 WRA Infant Outcome Assessment loader completed successfully.' as `|_________________| Operation_Summary |_________________|`;
+    -- Process Metrics
+    SET @v_tx_pro_ioa_v2 = (SELECT COUNT(io_v2.record_id) FROM crt_wra_visit_2_infant_outcome_overview io_v2);
+    SET @v_load_metrics = CONCAT_WS(' of ', @v_tx_pro_ioa_v2, @v_tx_pre_ioa_v2);
+    SET @v_load_info = CONCAT('WRA-Infant-Outcome-Assessment-V2-Data: LOADING COMPLETE. ', @v_load_metrics);
+    SELECT @v_load_info as `|_________________| Operation_Summary |_________________|`;
 
 END $$
 

@@ -64,7 +64,7 @@ BEGIN
                  CAST(wra_enr.hhe_hh_member_id AS UNSIGNED)                          as member_id,
                  SUBSTRING(useAutoTrimmer(wra_enr.hh_scrn_num_obsloc) FROM 1 FOR 14) as screening_id,
                  wra_enr.scrn_obsstdat                                               as screening_date,
-                 useAutoTrimmer(wra_enr.wra_ra_name)                                 as ra,
+                 useAutoTrimmer(wra_enr.wra_enr_interviewer_obsloc)                                 as ra,
                  get_WRA_Age(wra_enr.scrn_obsstdat, wra_enr.record_id)               as age,
                  wra_enr.brthdat                                                     as dob,
                  v.visit_number,
@@ -74,6 +74,14 @@ BEGIN
           WHERE CAST(wra_enr.wra_age AS UNSIGNED) > 0) v1
     WHERE v1.visit_id = 1
     ORDER BY v1.screening_date DESC;
+
+    UPDATE crt_wra_visit_1_overview o1
+        LEFT JOIN wra_forms_repeating_instruments v1 ON o1.alternate_id = v1.wra_forms_repeating_instruments_id
+    SET o1.ra = 'jdaka'
+    WHERE o1.ra = 'gmuyembe' AND v1.wra_ra_name LIKE '%Daka%'
+      AND o1.record_id = v1.record_id;
+
+
     COMMIT;
 
     -- flag completion

@@ -24,9 +24,13 @@ BEGIN
             SELECT @full_error;
             RESIGNAL;
         END;
+    -- Op matrices
+    SET @v_tx_pre_pa_v2 := 0; -- Initial count
+    SET @v_tx_pro_pa_v2 := 0; -- After count
 
     START TRANSACTION;
     TRUNCATE arch_etl_db.crt_wra_visit_2_pregnancy_assessments_overview;
+    SET @v_tx_pre_pa_v2 = (SELECT COUNT(pa.root_id) FROM wrafu_pregnancy_assessments pa);
     INSERT INTO arch_etl_db.crt_wra_visit_2_pregnancy_assessments_overview(record_id,
                                                                            wra_ptid,
                                                                            member_id,
@@ -49,7 +53,6 @@ BEGIN
     WHERE v2.record_id IN (SELECT DISTINCT a.record_id
                            FROM wrafu_pregnancy_assessments a
                            WHERE (a.np_fu_zapps_scorres IS NOT NULL OR a.np_fu_anc_mhyn IS NOT NULL) AND a.fu_name_veri IS NOT NULL)
-    GROUP BY v2.visit_date, v2.screening_id
     ORDER BY v2.visit_date DESC;
 
     UPDATE crt_wra_visit_2_pregnancy_assessments_overview v2
@@ -91,15 +94,19 @@ BEGIN
         v2.street_drugs_consumption_during_pregnancy = IF(pa.np_fu_drug_suyn = 1, 'Yes',
                                                           IF(pa.np_fu_drug_suyn = 0, 'No', pa.np_fu_drug_suyn)),
         v2.street_drug_consumption_frequency         = pa.np_fu_drug_usage_label,
-        v2.zapps_referral_acceptance                 = IF(pa.fu_ref_likely_scorres = 1, 'Yes',
-                                                          IF(pa.fu_ref_likely_scorres = 0, 'No', pa.fu_ref_likely_scorres)),
+        v2.zapps_referral_outcome                 = IF(pa.fu_ref_likely_scorres = 1, 'Accepted',
+                                                          IF(pa.fu_ref_likely_scorres = 0, 'Declined', pa.fu_ref_likely_scorres)),
         v2.preferred_zapps_clinic                    = pa.zr_fu_pref_zapps_scorres_label
     WHERE v2.record_id = pa.record_id
+      AND pa.record_id = poc.record_id
       AND poc.visit_number = v2.visit_number AND poc.upt_result = 'Positive';
     COMMIT;
 
-    -- flag completion
-    SELECT 'WRA FU-1 Pregnancy-Assessment-Data loader completed successfully.' as `status`;
+    -- Process Metrics
+    SET @v_tx_pro_pa_v2 = (SELECT COUNT(pa_v2.record_id) FROM crt_wra_visit_2_pregnancy_assessments_overview pa_v2);
+    SET @v_load_metrics = CONCAT_WS(' of ', @v_tx_pro_pa_v2, @v_tx_pre_pa_v2);
+    SET @v_load_info = CONCAT('WRA-Pregnancy-Assessment-V2-Data: LOADING COMPLETE. ', @v_load_metrics);
+    SELECT @v_load_info as `|_________________| Operation_Summary |_________________|`;
 
 END $$
 
