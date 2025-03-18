@@ -7,3 +7,5 @@ CREATE TABLE arch_etl_db.crt_ra_fu_accrual
     wra_followed_up              int         not null,
     wra_followed_up_and_screened int         not null
 );
+CREATE INDEX acc_ra_name_idx ON arch_etl_db.crt_ra_fu_accrual (ra_name);
+CREATE FULLTEXT INDEX acc_ft_idx ON arch_etl_db.crt_ra_fu_accrual (ra_name);

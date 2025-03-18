@@ -16,7 +16,7 @@ CREATE TABLE arch_etl_db.crt_wra_visit_5_pregnancy_overview
     pregnancy_identifier             TINYTEXT,
     last_upt_result                  VARCHAR(8),
     last_pregnancy_id                VARCHAR(14),
-    last_zapps_referral_outcome      ENUM ('Accepted', 'Not Accepted'),
+    last_zapps_referral_outcome      ENUM ('Accepted', 'Declined'),
     pregnant_since_last_visit        ENUM ('No', 'Yes'),
     same_pregnancy_since_last_visit  ENUM ('No', 'Yes'),
     pregnancy_count_since_last_visit SMALLINT,
