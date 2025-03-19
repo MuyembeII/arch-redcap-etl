@@ -18,7 +18,7 @@ BEGIN
             ROLLBACK;
             GET DIAGNOSTICS CONDITION 1 @sqlstate = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;
             SET @full_error =
-                    CONCAT_WS('\n', 'ERROR - Failed to load FU-2 WRA Pregnancy Overview;', @errno, '(', @sqlstate, '):',
+                    CONCAT_WS('\n', 'ERROR - Failed to load FU-1 WRA Pregnancy Overview;', @errno, '(', @sqlstate, '):',
                               @text);
             SELECT @full_error;
             RESIGNAL;
@@ -50,7 +50,7 @@ BEGIN
            v2.visit_date
     FROM crt_wra_visit_2_overview v2
     WHERE v2.visit_outcome = 'Completed'
-    GROUP BY v2.visit_date, v2.screening_id
+      AND v2.record_id IN (SELECT ps.record_id FROM wrafu_pregnancy_surveillance ps WHERE ps.fu_lmp_reg_scorres IS NOT NULL)
     ORDER BY v2.visit_date DESC;
 
     UPDATE crt_wra_visit_2_pregnancy_overview v2
@@ -75,7 +75,7 @@ BEGIN
     SET v2.last_upt_result             = poc.upt_result,
         v2.last_pregnancy_id           = poc.pregnancy_id,
         v2.last_zapps_referral_outcome = IF(pa_v1.zapps_referral_acceptance = 'Yes', 'Accepted',
-                                            IF(pa_v1.zapps_referral_acceptance = 'No', 'Not Accepted', NULL)),
+                                            IF(pa_v1.zapps_referral_acceptance = 'No', 'Declined', NULL)),
         v2.zapps_enrollment_status     = pa_v1.zapps_enrollment_status,
         v2.zapps_ptid                  = pa_v1.zapps_ptid
     WHERE poc.visit_number = 2.0;

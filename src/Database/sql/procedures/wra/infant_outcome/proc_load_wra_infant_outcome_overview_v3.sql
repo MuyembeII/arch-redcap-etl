@@ -42,6 +42,8 @@ BEGIN
                                                                     visit_number,
                                                                     visit_name,
                                                                     visit_date,
+                                                                    last_upt_result,
+                                                                    last_pregnancy_id,
                                                                     infant_name,
                                                                     infant_ptid,
                                                                     infant_gender,
@@ -61,19 +63,21 @@ BEGIN
            v3.visit_number,
            v3.visit_name,
            v3.visit_date,
+           get_Last_UPT_Result(v3.record_id, v3.visit_number)   as last_upt_result,
+           get_Last_Pregnancy_ID(v3.record_id, v3.visit_number) as last_pregnancy_id,
            v3.infant_name,
-           REPLACE(v3.infant_ptid, ' ', '') as infant_ptid,
+           REPLACE(v3.infant_ptid, ' ', '')                     as infant_ptid,
            v3.infant_gender,
            CASE
                WHEN v3.infant_mortality_outcome = 0 THEN 'Deceased'
                WHEN v3.infant_mortality_outcome = 1 THEN 'Living'
-               END                          as infant_mortality_outcome,
+               END                                              as infant_mortality_outcome,
            v3.infant_living_age_days,
            v3.infant_living_age_months,
            v3.infant_deceased_age_days,
            v3.infant_deceased_age_months
     FROM (SELECT ioa_3.wrafu_infant_outcome_assessment_repeating_instruments_id               as alternate_id,
-                 ioa_3.record_id,
+                 CAST(ioa_3.record_id AS UNSIGNED)                                            as record_id,
                  ROW_NUMBER() OVER (
                      PARTITION BY ioa_3.record_id ORDER BY ioa_3.redcap_repeat_instance DESC) as infant_id,
                  v3.wra_ptid,
@@ -98,12 +102,6 @@ BEGIN
           WHERE ioa_3.ioa_visit_date_f2 IS NOT NULL
             AND v3.visit_outcome = 'Completed') v3
     ORDER BY v3.visit_date DESC;
-
-    UPDATE crt_wra_visit_3_infant_outcome_overview v2
-        LEFT JOIN crt_wra_point_of_collection_overview poc ON v2.record_id = poc.record_id
-    SET v2.last_upt_result   = poc.upt_result,
-        v2.last_pregnancy_id = poc.pregnancy_id
-    WHERE poc.visit_number = 2.0; -- filter by previous POC visit
     COMMIT;
 
     -- Process Metrics

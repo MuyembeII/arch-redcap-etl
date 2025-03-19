@@ -73,7 +73,7 @@ BEGIN
            v2.infant_deceased_age_days,
            v2.infant_deceased_age_months
     FROM (SELECT ioa_2.infant_outcome_assessment_repeating_instruments_id                     as alternate_id,
-                 ioa_2.record_id,
+                 CAST(ioa_2.record_id AS UNSIGNED)                                            as record_id,
                  ROW_NUMBER() OVER (
                      PARTITION BY ioa_2.record_id ORDER BY ioa_2.redcap_repeat_instance DESC) as infant_id,
                  v2.wra_ptid,
