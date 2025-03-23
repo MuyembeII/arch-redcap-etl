@@ -18,7 +18,6 @@ WITH wra_fu_1_consent AS
                    LEFT JOIN wra_follow_up_visit_repeating_instruments f1
                              ON v2.alternate_id = f1.wra_follow_up_visit_repeating_instruments_id
           WHERE f1.wra_fu_conf_consent IN (0, 1)
-          GROUP BY v2.visit_number, v2.visit_date, v2.screening_id
           ORDER BY v2.visit_date DESC),
      wra_fu_2_consent AS
          (SELECT v3.*,
@@ -31,7 +30,6 @@ WITH wra_fu_1_consent AS
                    LEFT JOIN wra_follow_up_visit_2_repeating_instruments f2
                              ON v3.alternate_id = f2.wra_follow_up_visit_2_repeating_instruments_id
           WHERE f2.wra_fu_conf_consent_f2 IN (0, 1)
-          GROUP BY v3.visit_number, v3.visit_date, v3.screening_id
           ORDER BY v3.visit_date DESC),
      wra_fu_3_consent AS
          (SELECT v4.*,
@@ -44,7 +42,6 @@ WITH wra_fu_1_consent AS
                    LEFT JOIN wra_follow_up_visit_3_repeating_instruments f3
                              ON v4.alternate_id = f3.wra_follow_up_visit_3_repeating_instruments_id
           WHERE f3.wra_fu_conf_consent_f3 IN (0, 1)
-          GROUP BY v4.visit_number, v4.visit_date, v4.screening_id
           ORDER BY v4.visit_date DESC),
      wra_fu_4_consent AS
          (SELECT v5.*,
@@ -57,7 +54,6 @@ WITH wra_fu_1_consent AS
                    LEFT JOIN wra_follow_up_visit_4_repeating_instruments f4
                              ON v5.alternate_id = f4.wra_follow_up_visit_4_repeating_instruments_id
           WHERE f4.wra_fu_conf_consent_f4 IN (0, 1)
-          GROUP BY v5.visit_number, v5.visit_date, v5.screening_id
           ORDER BY v5.visit_date DESC),
      wra_fu_5_consent AS
          (SELECT v6.*,
@@ -70,7 +66,6 @@ WITH wra_fu_1_consent AS
                    LEFT JOIN wra_follow_up_visit_5_repeating_instruments f5
                              ON v6.alternate_id = f5.wra_follow_up_visit_5_repeating_instruments_id
           WHERE f5.wra_fu_conf_consent_f5 IN (0, 1)
-          GROUP BY v6.visit_number, v6.visit_date, v6.screening_id
           ORDER BY v6.visit_date DESC)
         (SELECT * FROM wra_fu_1_consent)
 UNION
