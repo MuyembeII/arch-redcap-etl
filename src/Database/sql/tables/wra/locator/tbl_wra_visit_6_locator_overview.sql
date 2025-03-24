@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS arch_etl_db.crt_wra_visit_2_locator_overview;
-CREATE TABLE arch_etl_db.crt_wra_visit_2_locator_overview
+DROP TABLE IF EXISTS arch_etl_db.crt_wra_visit_6_locator_overview;
+CREATE TABLE arch_etl_db.crt_wra_visit_6_locator_overview
 (
     record_id                               BIGINT UNSIGNED   NOT NULL PRIMARY KEY,
     alternate_id                            BIGINT UNSIGNED   NOT NULL,
@@ -36,19 +36,19 @@ CREATE TABLE arch_etl_db.crt_wra_visit_2_locator_overview
     second_contact_number_owner             TINYTEXT,
     second_contact_person_identification    TINYTEXT
 );
-CREATE UNIQUE INDEX visit_2_loc_alternate_id_idx ON arch_etl_db.crt_wra_visit_2_locator_overview (alternate_id);
-CREATE UNIQUE INDEX visit_2_loc_wra_ptid_idx ON arch_etl_db.crt_wra_visit_2_locator_overview (wra_ptid);
-CREATE INDEX visit_2_sbn_from_last_visit_known_idx ON arch_etl_db.crt_wra_visit_2_locator_overview (is_same_sbn_from_last_visit);
-CREATE INDEX visit_2_locality_name_known_idx ON arch_etl_db.crt_wra_visit_2_locator_overview (is_locality_name_known);
-CREATE INDEX visit_2_location_address_known_idx ON arch_etl_db.crt_wra_visit_2_locator_overview (is_location_address_known);
-CREATE INDEX visit_2_visible_landmark_near_location_known_idx ON arch_etl_db.crt_wra_visit_2_locator_overview (is_visible_landmark_near_location_known);
-CREATE INDEX visit_2_directions_known_idx ON arch_etl_db.crt_wra_visit_2_locator_overview (directions_known);
-CREATE INDEX visit_2_date_of_migration_idx ON arch_etl_db.crt_wra_visit_2_locator_overview (date_of_migration);
-CREATE INDEX visit_2_first_contact_details_valid_idx ON arch_etl_db.crt_wra_visit_2_locator_overview (is_first_contact_details_valid);
-CREATE INDEX visit_2_first_contact_number_owner_idx ON arch_etl_db.crt_wra_visit_2_locator_overview (first_contact_number_owner);
-CREATE INDEX visit_2_second_contact_details_valid_idx ON arch_etl_db.crt_wra_visit_2_locator_overview (is_second_contact_details_valid);
-CREATE INDEX visit_2_second_contact_number_owner_idx ON arch_etl_db.crt_wra_visit_2_locator_overview (second_contact_number_owner);
-CREATE FULLTEXT INDEX visit_2_loc_ft_idx ON arch_etl_db.crt_wra_visit_2_locator_overview (new_hh_screening_id,
+CREATE UNIQUE INDEX visit_6_loc_alternate_id_idx ON arch_etl_db.crt_wra_visit_6_locator_overview (alternate_id);
+CREATE UNIQUE INDEX visit_6_loc_wra_ptid_idx ON arch_etl_db.crt_wra_visit_6_locator_overview (wra_ptid);
+CREATE INDEX visit_6_sbn_from_last_visit_known_idx ON arch_etl_db.crt_wra_visit_6_locator_overview (is_same_sbn_from_last_visit);
+CREATE INDEX visit_6_locality_name_known_idx ON arch_etl_db.crt_wra_visit_6_locator_overview (is_locality_name_known);
+CREATE INDEX visit_6_location_address_known_idx ON arch_etl_db.crt_wra_visit_6_locator_overview (is_location_address_known);
+CREATE INDEX visit_6_visible_landmark_near_location_known_idx ON arch_etl_db.crt_wra_visit_6_locator_overview (is_visible_landmark_near_location_known);
+CREATE INDEX visit_6_directions_known_idx ON arch_etl_db.crt_wra_visit_6_locator_overview (directions_known);
+CREATE INDEX visit_6_date_of_migration_idx ON arch_etl_db.crt_wra_visit_6_locator_overview (date_of_migration);
+CREATE INDEX visit_6_first_contact_details_valid_idx ON arch_etl_db.crt_wra_visit_6_locator_overview (is_first_contact_details_valid);
+CREATE INDEX visit_6_first_contact_number_owner_idx ON arch_etl_db.crt_wra_visit_6_locator_overview (first_contact_number_owner);
+CREATE INDEX visit_6_second_contact_details_valid_idx ON arch_etl_db.crt_wra_visit_6_locator_overview (is_second_contact_details_valid);
+CREATE INDEX visit_6_second_contact_number_owner_idx ON arch_etl_db.crt_wra_visit_6_locator_overview (second_contact_number_owner);
+CREATE FULLTEXT INDEX visit_6_loc_ft_idx ON arch_etl_db.crt_wra_visit_6_locator_overview (new_hh_screening_id,
                                                                                           new_migration_location,
                                                                                           locality_name,
                                                                                           address_plot_number,
