@@ -9,11 +9,20 @@
  */
 DROP FUNCTION IF EXISTS `get_WRA_HH_Screening_ID`;
 DELIMITER $$
-CREATE FUNCTION get_WRA_HH_Screening_ID(p_record_id INT)
+CREATE FUNCTION get_WRA_HH_Screening_ID(p_record_id BIGINT)
     RETURNS VARCHAR(14)
     NOT DETERMINISTIC
 BEGIN
     DECLARE v_hh_screening_id VARCHAR(14);
+
+    -- Get HH SID Visit 6.0
+    SELECT v6.fu_loc_same_hh_lv_f5,
+           CONCAT_WS('-', v6.wra_fu_cluster_new_f5_label, v6.wra_fu_sbn_new_f5_label, v6.wra_fu_hun_new_f5_label,
+                     v6.wra_fu_hhn_new_f5_label)
+    INTO @v_v6_same_hh, @v_v6_new_hh
+    FROM wra_follow_up_visit_5_repeating_instruments v6
+    WHERE v6.record_id = p_record_id
+      AND v6.wra_fu_pp_avail_f5 = 1;
 
     -- Get HH SID Visit 5.0
     SELECT v5.fu_loc_same_hh_lv_f4,
@@ -59,7 +68,9 @@ BEGIN
       AND v1.wra_enr_pp_avail = 1;
 
     -- Start with last visit
-    IF @v_v5_same_hh = 0 THEN
+    IF @v_v6_same_hh = 0 THEN
+        SET v_hh_screening_id = @v_v6_new_hh;
+    ELSEIF @v_v5_same_hh = 0 THEN
         SET v_hh_screening_id = @v_v5_new_hh;
     ELSEIF @v_v4_same_hh = 0 THEN
         SET v_hh_screening_id = @v_v4_new_hh;
@@ -71,7 +82,7 @@ BEGIN
         SET v_hh_screening_id = @v_v1_hh;
     END IF;
 
-    -- Return status as result
+    -- Latest HH Screening ID
     RETURN v_hh_screening_id;
 END $$
 
