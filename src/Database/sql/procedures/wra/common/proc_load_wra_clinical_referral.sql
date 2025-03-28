@@ -58,7 +58,7 @@ BEGIN
                      PARTITION BY ref.record_id ORDER BY ref.redcap_repeat_instance DESC)                 as referral_id,
                  v1.wra_ptid,
                  v1.member_id,
-                 v1.screening_id,
+                 get_WRA_HH_Screening_ID(CAST(ref.record_id AS UNSIGNED))                                 as screening_id,
                  get_WRA_Age(COALESCE(ref.cr_visit_date, v1.visit_date), CAST(ref.record_id AS UNSIGNED)) as age,
                  COALESCE(ref.cr_interviewer_obsloc, v1.ra)                                               as ra,
                  v.visit_number,
@@ -66,7 +66,7 @@ BEGIN
                  COALESCE(ref.cr_visit_date, v1.visit_date)                                               as visit_date,
                  IF(ref.cr_refer_to = 4, 'Other', ref.cr_refer_to_label)                                  as referral_destination,
                  useStringCapFirst(useAutoTrimmer(ref.cr_refer_to_other))                                 as other_referral_destination,
-                 'TODO'                                                                                   as reason_for_referral,
+                 get_Referral_Reasons(ref.clinical_referral_repeating_instruments_id)                     as reason_for_referral,
                  useStringCapFirst(useAutoTrimmer(ref.referral_reasons_other))                            as other_reason_for_referral,
                  useStringCapFirst(useAutoTrimmer(ref.cr_ra_comments))                                    as comments
           FROM clinical_referral_repeating_instruments ref
