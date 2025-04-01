@@ -3,12 +3,12 @@
  * @author Gift Jr <muyembegift@gmail.com> | 01.04.25
  * @since 0.0.1
  * @alias Perceived Stress Assessment Score.
- * @param BIGINT | DS ID
+ * @param BIGINT | SA ID
  * @return Score
  */
 DROP FUNCTION IF EXISTS `getStressAssessmentScore`;
 DELIMITER $$
-CREATE FUNCTION getStressAssessmentScore(p_id BIGINT)
+CREATE FUNCTION getStressAssessmentScore(p_sa_id BIGINT)
     RETURNS SMALLINT
     NOT DETERMINISTIC
 BEGIN
@@ -24,7 +24,7 @@ BEGIN
     DECLARE v_p9 SMALLINT;
     DECLARE v_p10 SMALLINT;
 
-    SET @v_tx_0 := '';
+    SET @v_tx_mh_sa := 0;
 
     SELECT mh.pss_upset_scorres,
            mh.pss_no_ctrl_scorres,
@@ -71,11 +71,11 @@ BEGIN
         v_p9,
         v_p10
     FROM wra_mental_health_assessment mh
-    WHERE mh.wra_mental_health_assessment_id = p_id;
+    WHERE mh.wra_mental_health_assessment_id = p_sa_id;
 
-    SET @v_tx_mh = (v_p1 + v_p2 + v_p3 + v_p4 + v_p5 + v_p6 + v_p7 + v_p8 + v_p9 + v_p10);
+    SET @v_tx_mh_sa = (v_p1 + v_p2 + v_p3 + v_p4 + v_p5 + v_p6 + v_p7 + v_p8 + v_p9 + v_p10);
 
-    RETURN @v_tx_mh;
+    RETURN @v_tx_mh_sa;
 END $$
 
 DELIMITER ;
