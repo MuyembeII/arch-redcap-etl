@@ -27,12 +27,12 @@ BEGIN
 
     SET @v_reasons_output := '';
 
-    SELECT IF(r.referral_reasons___1 = 1, r.referral_reasons___1_label, ''),
-           IF(r.referral_reasons___2 = 1, r.referral_reasons___2_label, ''),
-           IF(r.referral_reasons___3 = 1, r.referral_reasons___3_label, ''),
-           IF(r.referral_reasons___4 = 1, r.referral_reasons___4_label, ''),
-           IF(r.referral_reasons___5 = 1, r.referral_reasons___5_label, ''),
-           IF(r.referral_reasons___6 = 1, r.referral_reasons___6_label, ''),
+    SELECT IF(r.referral_reasons___1 = 1, CONCAT_WS(',', r.referral_reasons___1_label, ' '), ''),
+           IF(r.referral_reasons___2 = 1, CONCAT_WS(',', r.referral_reasons___2_label, ' '), ''),
+           IF(r.referral_reasons___3 = 1, CONCAT_WS(',', r.referral_reasons___3_label, ' '), ''),
+           IF(r.referral_reasons___4 = 1, CONCAT_WS(',', r.referral_reasons___4_label, ' '), ''),
+           IF(r.referral_reasons___5 = 1, CONCAT_WS(',', r.referral_reasons___5_label, ' '), ''),
+           IF(r.referral_reasons___6 = 1, CONCAT_WS(',', r.referral_reasons___6_label, ' '), ''),
            IF(r.referral_reasons___7 = 1, r.referral_reasons_other, '')
     INTO v_referral_reason_pregnancy_care,
         v_referral_reason_depression_anxiety,
@@ -44,25 +44,16 @@ BEGIN
     FROM clinical_referral_repeating_instruments r
     WHERE r.clinical_referral_repeating_instruments_id = p_id;
 
-    SET @v_reasons_output = CONCAT_WS(', ',
-                                      useStringCapFirst(v_referral_reason_pregnancy_care),
-                                      v_referral_reason_depression_anxiety,
-                                      useStringCapFirst(v_referral_reason_high_blood_pressure),
-                                      useStringCapFirst(v_referral_reason_pos_covid_screen),
-                                      useStringCapFirst(v_referral_reason_malnutrition),
-                                      useStringCapFirst(v_referral_reason_hypertension),
-                                      v_referral_reason_other
+    SET @v_reasons_output = CONCAT_WS(
+            useStringCapFirst(v_referral_reason_pregnancy_care),
+            v_referral_reason_depression_anxiety,
+            useStringCapFirst(v_referral_reason_high_blood_pressure),
+            useStringCapFirst(v_referral_reason_pos_covid_screen),
+            useStringCapFirst(v_referral_reason_malnutrition),
+            useStringCapFirst(v_referral_reason_hypertension),
+            v_referral_reason_other
                             );
-    -- , Depression or Anxiety , BMI overweight
-    SET @v_reasons_output = REGEXP_REPLACE(@v_reasons_output, ' , ', ', ');
-    SET @v_reasons_output = REGEXP_REPLACE(@v_reasons_output, ' ,', ',');
-    SET @v_reasons_output = REGEXP_REPLACE(@v_reasons_output, ',,', ',');
-    SET @v_reasons_output = TRIM(BOTH '   ' FROM @v_reasons_output);
-    SET @v_reasons_output = TRIM(BOTH ',' FROM @v_reasons_output);
-    SET @v_reasons_output = TRIM(TRAILING ', ' FROM @v_reasons_output);
-    SET @v_reasons_output = TRIM(TRAILING ',,' FROM @v_reasons_output);
     SET @v_reasons_output = TRIM(TRAILING ',' FROM @v_reasons_output);
-    SET @v_reasons_output = REGEXP_REPLACE(@v_reasons_output, ',, ', ', ');
 
     RETURN @v_reasons_output;
 END $$
