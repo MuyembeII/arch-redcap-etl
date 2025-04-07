@@ -51,7 +51,8 @@ BEGIN
                WHEN 2 THEN 3
                WHEN 3 THEN 2
                WHEN 4 THEN 1
-               ELSE 0
+               WHEN 5 THEN 0
+               ELSE NULL
                END                                                               vaginal_swabs_collected,
            poc.upt_lborres_label                                              as upt_result,
            (IF(poc.upt_lborres = 1, CONCAT_WS(

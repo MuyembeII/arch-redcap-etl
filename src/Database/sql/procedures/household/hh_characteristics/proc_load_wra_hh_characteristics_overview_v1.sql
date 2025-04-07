@@ -61,7 +61,7 @@ BEGIN
     WHERE v1.record_id IN
           (SELECT CAST(bsl.record_id as UNSIGNED) as record_id
            FROM wra_forms_repeating_instruments bsl
-           WHERE bsl.scd_comments_yn IS NOT NULL)
+           WHERE bsl.scd_comments_yn IS NOT NULL AND hhc_completed = 0)
     ORDER BY v1.visit_date, v1.screening_id DESC;
 
     UPDATE crt_wra_household_characteristics_overview hhc
