@@ -18,6 +18,9 @@ CREATE TABLE arch_etl_db.crt_wra_visit_1_pregnancy_overview
     still_birth_count              SMALLINT,
     menstruation_outcome           TINYTEXT,
     no_menstruals_reason           TINYTEXT,
+    lmp_date                       DATE,
+    estimated_lmp                  TINYINT,
+    estimated_lmp_flag             TINYTEXT,
     currently_pregnant             TINYTEXT,
     pregnancy_identifier           TINYTEXT
 );

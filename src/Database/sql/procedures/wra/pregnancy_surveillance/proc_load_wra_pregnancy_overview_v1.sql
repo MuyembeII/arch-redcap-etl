@@ -66,6 +66,7 @@ BEGIN
         v1.no_menstruals_reason           = IF(pos_v1.lmp_kd_scorres = 96,
                                                CONCAT_WS(' - ', 'Other', pos_v1.lmp_kd_scorres_other),
                                                pos_v1.lmp_kd_scorres_label),
+        v1.lmp_date                       = pos_v1.lmp_scdat,
         v1.currently_pregnant             = pos_v1.preg_scorres_label,
         v1.pregnancy_identifier           = pos_v1.np_pregid_mhyn_label
     WHERE v1.record_id = pos_v1.record_id;

@@ -50,7 +50,8 @@ BEGIN
            v2.visit_date
     FROM crt_wra_visit_2_overview v2
     WHERE v2.visit_outcome = 'Completed'
-      AND v2.record_id IN (SELECT ps.record_id FROM wrafu_pregnancy_surveillance ps WHERE ps.fu_lmp_reg_scorres IS NOT NULL)
+      AND v2.record_id IN
+          (SELECT ps.record_id FROM wrafu_pregnancy_surveillance ps WHERE ps.fu_lmp_reg_scorres IS NOT NULL)
     ORDER BY v2.visit_date DESC;
 
     UPDATE crt_wra_visit_2_pregnancy_overview v2
@@ -60,6 +61,7 @@ BEGIN
                                                     ps_v2.fu_lmp_reg_scorres)),
         v2.no_menstruals_reason             = IF(ps_v2.fu_lmp_kd_scorres = 96, CONCAT_WS(
                 ' - ', 'Other', ps_v2.lmp_kd_scorres_othr), ps_v2.fu_lmp_kd_scorres_label),
+        v2.lmp_date                         = ps_v2.fu_lmp_scdat,
         v2.currently_pregnant               = ps_v2.fu_preg_scorres_label,
         v2.pregnancy_identifier             = ps_v2.fu_np_pregid_mhyn_label,
         v2.pregnant_since_last_visit        = IF(ps_v2.ps_preg_last_visit = 1, 'Yes',
