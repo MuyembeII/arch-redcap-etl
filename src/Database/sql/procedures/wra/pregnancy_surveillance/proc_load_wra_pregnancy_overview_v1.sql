@@ -67,6 +67,14 @@ BEGIN
                                                CONCAT_WS(' - ', 'Other', pos_v1.lmp_kd_scorres_other),
                                                pos_v1.lmp_kd_scorres_label),
         v1.lmp_date                       = pos_v1.lmp_scdat,
+        v1.estimated_lmp                  = CASE pos_v1.lmp_cat_scorres
+                                                WHEN 0 THEN pos_v1.lmp_start_weeks
+                                                WHEN 1 THEN pos_v1.lmp_start_months
+                                                WHEN 2 THEN pos_v1.lmp_start_years END,
+        v1.estimated_lmp_flag             = CASE pos_v1.lmp_cat_scorres
+                                                WHEN 0 THEN 'week(s)'
+                                                WHEN 1 THEN 'month(s)'
+                                                WHEN 2 THEN 'year(s)' END,
         v1.currently_pregnant             = pos_v1.preg_scorres_label,
         v1.pregnancy_identifier           = pos_v1.np_pregid_mhyn_label
     WHERE v1.record_id = pos_v1.record_id;

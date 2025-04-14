@@ -63,6 +63,14 @@ BEGIN
                 ' - ', 'Other', ps_v5.lmp_kd_scorres_othr_f4), ps_v5.fu_lmp_kd_scorres_f4_label),
         v5.currently_pregnant               = ps_v5.fu_preg_scorres_f4_label,
         v5.lmp_date                         = ps_v5.fu_lmp_scdat_f4,
+        v5.estimated_lmp                    = CASE ps_v5.fu_lmp_cat_scorres_f4
+                                                  WHEN 0 THEN ps_v5.fu_lmp_start_weeks_f4
+                                                  WHEN 1 THEN ps_v5.fu_lmp_start_months_f4
+                                                  WHEN 2 THEN ps_v5.fu_lmp_start_years_f4 END,
+        v5.estimated_lmp_flag               = CASE ps_v5.fu_lmp_cat_scorres_f4
+                                                  WHEN 0 THEN 'week(s)'
+                                                  WHEN 1 THEN 'month(s)'
+                                                  WHEN 2 THEN 'year(s)' END,
         v5.pregnancy_identifier             = ps_v5.fu_np_pregid_mhyn_f4_label,
         v5.pregnant_since_last_visit        = IF(ps_v5.ps_preg_last_visit_f4 = 1, 'Yes',
                                                  IF(ps_v5.ps_preg_last_visit_f4 = 0, 'No',

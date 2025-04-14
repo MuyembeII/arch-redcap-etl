@@ -62,6 +62,14 @@ BEGIN
         v2.no_menstruals_reason             = IF(ps_v2.fu_lmp_kd_scorres = 96, CONCAT_WS(
                 ' - ', 'Other', ps_v2.lmp_kd_scorres_othr), ps_v2.fu_lmp_kd_scorres_label),
         v2.lmp_date                         = ps_v2.fu_lmp_scdat,
+        v2.estimated_lmp                    = CASE ps_v2.fu_lmp_cat_scorres
+                                                  WHEN 0 THEN ps_v2.fu_lmp_start_weeks
+                                                  WHEN 1 THEN ps_v2.fu_lmp_start_months
+                                                  WHEN 2 THEN ps_v2.fu_lmp_start_years END,
+        v2.estimated_lmp_flag               = CASE ps_v2.fu_lmp_cat_scorres
+                                                  WHEN 0 THEN 'week(s)'
+                                                  WHEN 1 THEN 'month(s)'
+                                                  WHEN 2 THEN 'year(s)' END,
         v2.currently_pregnant               = ps_v2.fu_preg_scorres_label,
         v2.pregnancy_identifier             = ps_v2.fu_np_pregid_mhyn_label,
         v2.pregnant_since_last_visit        = IF(ps_v2.ps_preg_last_visit = 1, 'Yes',
