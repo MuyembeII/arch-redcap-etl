@@ -1,58 +1,49 @@
 /**
- * Returns WRA estimated gestational age in days.
- * @author Gift Jr <muyembegift@gmail.com> | 14.04.25
+ * Returns WRA Follow-Up 4 estimated gestational age in Week(s) and Day(s).
+
+ * By using the LMP date and the current visit date to find the difference in
+ * days, the result is casted into weeks and then the remainder of days appended
+ * is appended after the week expression i,.e 29.4 is denoted as 29 weeks and 4
+ * days. Note that the days expression range is 1 to 7.
+ *
+ * @author Gift Jr <muyembegift@gmail.com> | 09.04.25
  * @since 0.0.1
  * @alias WRA Estimated Gestational Age.
  * @param BIGINT | Record ID
- * @return MEDIUMINT | Days
+ * @return DOUBLE | Week(s) and Day(s)
+ * @see https://github.com/GITmarvel/EDD-and-EGA-calculation
  */
 DROP FUNCTION IF EXISTS `getEstimatedGestationalAge_V5`;
 DELIMITER $$
 CREATE FUNCTION arch_etl_db.getEstimatedGestationalAge_V5(p_record_id BIGINT)
-    RETURNS MEDIUMINT
+    RETURNS DOUBLE
     READS SQL DATA
-    NOT DETERMINISTIC
+    DETERMINISTIC
 BEGIN
     DECLARE v_ega MEDIUMINT DEFAULT 0;
     DECLARE v_current_visit_date DATE;
     DECLARE v_fu_lmp_date DATE;
-    DECLARE v_estimated_fu_lmp SMALLINT;
-    DECLARE v_estimated_fu_lmp_flag VARCHAR(8);
 
     SELECT COALESCE(ps_v5.ps_fu_visit_date_f4, v5.visit_date),
-           ps_v5.fu_lmp_scdat_f4,
-           CASE ps_v5.fu_lmp_cat_scorres_f4
-               WHEN 0 THEN ps_v5.fu_lmp_start_weeks_f4
-               WHEN 1 THEN ps_v5.fu_lmp_start_months_f4
-               WHEN 2 THEN ps_v5.fu_lmp_start_years_f4 END,
-           CASE ps_v5.fu_lmp_cat_scorres_f4
-               WHEN 0 THEN 'week(s)'
-               WHEN 1 THEN 'month(s)'
-               WHEN 2 THEN 'year(s)' END
-    INTO v_current_visit_date, v_fu_lmp_date, v_estimated_fu_lmp, v_estimated_fu_lmp_flag
+           IF(ps_v5.fu_lmp_start_scorres_f4 = 1, ps_v5.fu_lmp_scdat_f4, getEstimated_LMP_V1(p_record_id))
+    INTO v_current_visit_date, v_fu_lmp_date
     FROM wrafu_pregnancy_surveillance_4 ps_v5
              JOIN arch_etl_db.crt_wra_visit_5_overview v5 on ps_v5.record_id = v5.record_id
     WHERE ps_v5.record_id = p_record_id;
 
-    -- Use estimated LMP when exact date is not given
-    IF v_estimated_fu_lmp_flag = 'week(s)' THEN
-        SET v_fu_lmp_date = DATE_SUB(v_current_visit_date, INTERVAL v_estimated_fu_lmp WEEK);
-    ELSEIF v_estimated_fu_lmp_flag = 'month(s)' THEN
-        SET v_fu_lmp_date = DATE_SUB(v_current_visit_date, INTERVAL v_estimated_fu_lmp MONTH);
-    ELSEIF v_estimated_fu_lmp_flag = 'year(s)' THEN
-        SET v_fu_lmp_date = DATE_SUB(v_current_visit_date, INTERVAL v_estimated_fu_lmp YEAR);
+    -- LMP date cannot be in the future.
+    IF v_fu_lmp_date IS NOT NULL AND v_fu_lmp_date <= v_current_visit_date THEN
+        -- Calculate the total number of days between the LMP date and the current visit date
+        SET @ega_days_difference = DATEDIFF(v_current_visit_date, v_fu_lmp_date);
+        -- Calculate the number of full weeks, integer division in SQL automatically floors the result
+        SET @ega_weeks = @ega_days_difference / 7;
+        -- Calculate the remaining number of days
+        SET @ega_remainder_days = @ega_days_difference % 7;
+        -- Merge week(s) and day(s) into final EGA result
+        SET v_ega = CAST(CONCAT_WS('.', @ega_weeks, @ega_remainder_days) as DOUBLE);
+    ELSE
+        RETURN NULL;
     END IF;
-    -- Calculate the age of the fetus in the womb using the 4 ⅓ formula.
-    SET @v_fu_lmp_day = CAST(DAY(v_fu_lmp_date) as UNSIGNED); -- LMP Date Day
-    SET @v_curr_day = CAST(DAY(v_current_visit_date) as UNSIGNED); -- Visit Date Day
-    SET @v_fu_lmp_month = CAST(MONTH(v_fu_lmp_date) as UNSIGNED); -- LMP Date Month
-    SET @v_curr_month = CAST(MONTH(v_current_visit_date) as UNSIGNED);
-    -- Visit Date Month
-    -- Gestational age = {(Current date – LMP) x (4 ⅓)}
-    SET @v_ga_days = (@v_curr_day - @v_fu_lmp_day);
-    SET @v_ga_months = (@v_curr_month - @v_fu_lmp_month);
-    SET @v_ga_m_weeks = @v_ga_months * (4 * (1 / 3));
-    SET v_ega = @v_ga_days + (@v_ga_m_weeks * 7);
 
     RETURN v_ega;
 END $$
