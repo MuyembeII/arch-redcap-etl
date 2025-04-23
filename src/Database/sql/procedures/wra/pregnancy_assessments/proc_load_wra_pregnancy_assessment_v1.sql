@@ -92,6 +92,7 @@ BEGIN
         v1.tobacco_consumption_during_pregnancy      = IF(pa.np_tob_suyn = 1, 'Yes',
                                                           IF(pa.np_tob_suyn = 0, 'No', pa.np_tob_suyn)),
         v1.tobacco_consumption_frequency             = pa.np_tob_cur_sudosfrq_label,
+        v1.other_tobacco_consumption_during_pregnancy = '',
         v1.street_drugs_consumption_during_pregnancy = IF(pa.np_drug_suyn = 1, 'Yes',
                                                           IF(pa.np_drug_suyn = 0, 'No', pa.np_drug_suyn)),
         v1.street_drug_consumption_frequency         = pa.np_drug_usage_label,
