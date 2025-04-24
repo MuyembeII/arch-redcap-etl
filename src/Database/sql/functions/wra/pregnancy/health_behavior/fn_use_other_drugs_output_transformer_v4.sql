@@ -48,7 +48,7 @@ BEGIN
             v_hb_other_drugs_consumed_5,
             v_hb_other_drugs_consumed_6,
             v_hb_other_drugs_consumed_7);
-    SET v_hb_other_drugs_consumed_v4 = TRIM(',' FROM v_hb_other_drugs_consumed_v4);
+    SET v_hb_other_drugs_consumed_v4 = TRIM(',' FROM TRIM(v_hb_other_drugs_consumed_v4));
 
     RETURN v_hb_other_drugs_consumed_v4;
 END $$

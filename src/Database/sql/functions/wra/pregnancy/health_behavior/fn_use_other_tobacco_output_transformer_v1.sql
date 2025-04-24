@@ -48,7 +48,7 @@ BEGIN
             v_hb_other_tobacco_consumed_5,
             v_hb_other_tobacco_consumed_6,
             v_hb_other_tobacco_consumed_7);
-    SET v_hb_other_tobacco_consumed_v1 = TRIM(',' FROM v_hb_other_tobacco_consumed_v1);
+    SET v_hb_other_tobacco_consumed_v1 = TRIM(',' FROM TRIM(v_hb_other_tobacco_consumed_v1));
 
     RETURN v_hb_other_tobacco_consumed_v1;
 END $$
