@@ -23,12 +23,12 @@ BEGIN
     DECLARE v_hb_other_drugs_consumed_6 VARCHAR(32);
     DECLARE v_hb_other_drugs_consumed_7 VARCHAR(32);
 
-    SELECT IF(pa_v4.np_fu_drug_sutrt_f3___1 = 1, CONCAT_WS(',', pa_v4.np_fu_drug_sutrt_f3___1_label, ' '), ''),
-           IF(pa_v4.np_fu_drug_sutrt_f3___2 = 1, CONCAT_WS(',', pa_v4.np_fu_drug_sutrt_f3___2_label, ' '), ''),
-           IF(pa_v4.np_fu_drug_sutrt_f3___3 = 1, CONCAT_WS(',', pa_v4.np_fu_drug_sutrt_f3___3_label, ' '), ''),
-           IF(pa_v4.np_fu_drug_sutrt_f3___4 = 1, CONCAT_WS(',', pa_v4.np_fu_drug_sutrt_f3___4_label, ' '), ''),
-           IF(pa_v4.np_fu_drug_sutrt_f3___5 = 1, CONCAT_WS(',', pa_v4.np_fu_drug_sutrt_f3___5_label, ' '), ''),
-           IF(pa_v4.np_fu_drug_sutrt_f3___6 = 1, CONCAT_WS(',', pa_v4.np_fu_drug_sutrt_f3___6_label, ' '), ''),
+    SELECT IF(pa_v4.np_fu_drug_sutrt_f3___1 = 1, pa_v4.np_fu_drug_sutrt_f3___1_label, ''),
+           IF(pa_v4.np_fu_drug_sutrt_f3___2 = 1, pa_v4.np_fu_drug_sutrt_f3___2_label, ''),
+           IF(pa_v4.np_fu_drug_sutrt_f3___3 = 1, pa_v4.np_fu_drug_sutrt_f3___3_label, ''),
+           IF(pa_v4.np_fu_drug_sutrt_f3___4 = 1, pa_v4.np_fu_drug_sutrt_f3___4_label, ''),
+           IF(pa_v4.np_fu_drug_sutrt_f3___5 = 1, pa_v4.np_fu_drug_sutrt_f3___5_label, ''),
+           IF(pa_v4.np_fu_drug_sutrt_f3___6 = 1, pa_v4.np_fu_drug_sutrt_f3___6_label, ''),
            IF(pa_v4.np_fu_drug_sutrt_f3___7 = 1, pa_v4.np_fu_drug_sutrt_othr_f3, '')
     INTO v_hb_other_drugs_consumed_1,
         v_hb_other_drugs_consumed_2,
@@ -40,7 +40,8 @@ BEGIN
     FROM wrafu_pregnancy_assessments_3 pa_v4
     WHERE CAST(pa_v4.record_id as UNSIGNED) = p_record_id;
 
-    SET v_hb_other_drugs_consumed_v4 = CONCAT(
+    SET v_hb_other_drugs_consumed_v4 = CONCAT_WS(
+            ',',
             v_hb_other_drugs_consumed_1,
             v_hb_other_drugs_consumed_2,
             v_hb_other_drugs_consumed_3,
@@ -48,8 +49,8 @@ BEGIN
             v_hb_other_drugs_consumed_5,
             v_hb_other_drugs_consumed_6,
             v_hb_other_drugs_consumed_7);
-    SET v_hb_other_drugs_consumed_v4 = TRIM(',' FROM TRIM(v_hb_other_drugs_consumed_v4));
-
+    SET @v_other_drugs_consumed_v4 = TRIM(',' FROM @v_other_drugs_consumed_v4);
+    SET v_hb_other_drugs_consumed_v4 = REGEXP_REPLACE(@v_other_drugs_consumed_v4, ',', CONCAT(',', SPACE(1)));
     RETURN v_hb_other_drugs_consumed_v4;
 END $$
 DELIMITER ;

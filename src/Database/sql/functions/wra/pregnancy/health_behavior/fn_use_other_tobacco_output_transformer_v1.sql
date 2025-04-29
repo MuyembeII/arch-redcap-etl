@@ -23,12 +23,12 @@ BEGIN
     DECLARE v_hb_other_tobacco_consumed_6 VARCHAR(32);
     DECLARE v_hb_other_tobacco_consumed_7 VARCHAR(32);
 
-    SELECT IF(pa_v1.tob_oth_sutrt___1 = 1, CONCAT_WS(',', pa_v1.tob_oth_sutrt___1_label, ' '), ''),
-           IF(pa_v1.tob_oth_sutrt___2 = 1, CONCAT_WS(',', pa_v1.tob_oth_sutrt___2_label, ' '), ''),
-           IF(pa_v1.tob_oth_sutrt___3 = 1, CONCAT_WS(',', pa_v1.tob_oth_sutrt___3_label, ' '), ''),
-           IF(pa_v1.tob_oth_sutrt___4 = 1, CONCAT_WS(',', pa_v1.tob_oth_sutrt___4_label, ' '), ''),
-           IF(pa_v1.tob_oth_sutrt___5 = 1, CONCAT_WS(',', pa_v1.tob_oth_sutrt___5_label, ' '), ''),
-           IF(pa_v1.tob_oth_sutrt___6 = 1, CONCAT_WS(',', pa_v1.tob_oth_sutrt___6_label, ' '), ''),
+    SELECT IF(pa_v1.tob_oth_sutrt___1 = 1, pa_v1.tob_oth_sutrt___1_label, ''),
+           IF(pa_v1.tob_oth_sutrt___2 = 1, pa_v1.tob_oth_sutrt___2_label, ''),
+           IF(pa_v1.tob_oth_sutrt___3 = 1, pa_v1.tob_oth_sutrt___3_label, ''),
+           IF(pa_v1.tob_oth_sutrt___4 = 1, pa_v1.tob_oth_sutrt___4_label, ''),
+           IF(pa_v1.tob_oth_sutrt___5 = 1, pa_v1.tob_oth_sutrt___5_label, ''),
+           IF(pa_v1.tob_oth_sutrt___6 = 1, pa_v1.tob_oth_sutrt___6_label, ''),
            IF(pa_v1.tob_oth_sutrt___7 = 1, pa_v1.other_tbc_use, '')
     INTO v_hb_other_tobacco_consumed_1,
         v_hb_other_tobacco_consumed_2,
@@ -39,8 +39,9 @@ BEGIN
         v_hb_other_tobacco_consumed_7
     FROM wra_pregnancy_assessments pa_v1
     WHERE CAST(pa_v1.record_id as UNSIGNED) = p_record_id;
-
-    SET v_hb_other_tobacco_consumed_v1 = CONCAT(
+    -- transform activated options into immutable list
+    SET @v_other_tobacco_consumed_v1 = CONCAT_WS(
+            ',',
             v_hb_other_tobacco_consumed_1,
             v_hb_other_tobacco_consumed_2,
             v_hb_other_tobacco_consumed_3,
@@ -48,8 +49,8 @@ BEGIN
             v_hb_other_tobacco_consumed_5,
             v_hb_other_tobacco_consumed_6,
             v_hb_other_tobacco_consumed_7);
-    SET v_hb_other_tobacco_consumed_v1 = TRIM(',' FROM TRIM(v_hb_other_tobacco_consumed_v1));
-
+    SET @v_other_tobacco_consumed_v1 = TRIM(',' FROM TRIM(@v_other_tobacco_consumed_v1));
+    SET v_hb_other_tobacco_consumed_v1 = REGEXP_REPLACE(@v_other_tobacco_consumed_v1, ',', CONCAT(',', SPACE(1)));
     RETURN v_hb_other_tobacco_consumed_v1;
 END $$
 DELIMITER ;

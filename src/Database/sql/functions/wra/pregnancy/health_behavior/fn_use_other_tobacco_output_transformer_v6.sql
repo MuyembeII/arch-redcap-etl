@@ -14,7 +14,6 @@ CREATE FUNCTION use_OtherTobaccoConsumedTransformer_V6(p_record_id BIGINT)
     DETERMINISTIC
 BEGIN
     DECLARE v_hb_other_tobacco_consumed_v6 TEXT;
-
     DECLARE v_hb_other_tobacco_consumed_1 VARCHAR(32);
     DECLARE v_hb_other_tobacco_consumed_2 VARCHAR(32);
     DECLARE v_hb_other_tobacco_consumed_3 VARCHAR(32);
@@ -39,8 +38,9 @@ BEGIN
         v_hb_other_tobacco_consumed_7
     FROM wrafu_pregnancy_assessments_5 pa_v6
     WHERE CAST(pa_v6.record_id as UNSIGNED) = p_record_id;
-
-    SET v_hb_other_tobacco_consumed_v6 = CONCAT(
+    -- transform activated options into immutable list
+    SET @v_other_tobacco_consumed_v6 = CONCAT_WS(
+            ',',
             v_hb_other_tobacco_consumed_1,
             v_hb_other_tobacco_consumed_2,
             v_hb_other_tobacco_consumed_3,
@@ -48,8 +48,8 @@ BEGIN
             v_hb_other_tobacco_consumed_5,
             v_hb_other_tobacco_consumed_6,
             v_hb_other_tobacco_consumed_7);
-    SET v_hb_other_tobacco_consumed_v6 = TRIM(',' FROM TRIM(v_hb_other_tobacco_consumed_v6));
-
+    SET @v_other_tobacco_consumed_v6 = TRIM(',' FROM TRIM(@v_other_tobacco_consumed_v6));
+    SET v_hb_other_tobacco_consumed_v6 = REGEXP_REPLACE(@v_other_tobacco_consumed_v6, ',', CONCAT(',', SPACE(1)));
     RETURN v_hb_other_tobacco_consumed_v6;
 END $$
 DELIMITER ;

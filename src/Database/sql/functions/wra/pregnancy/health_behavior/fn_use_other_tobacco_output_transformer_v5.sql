@@ -14,7 +14,6 @@ CREATE FUNCTION use_OtherTobaccoConsumedTransformer_V5(p_record_id BIGINT)
     DETERMINISTIC
 BEGIN
     DECLARE v_hb_other_tobacco_consumed_v5 TEXT;
-
     DECLARE v_hb_other_tobacco_consumed_1 VARCHAR(32);
     DECLARE v_hb_other_tobacco_consumed_2 VARCHAR(32);
     DECLARE v_hb_other_tobacco_consumed_3 VARCHAR(32);
@@ -23,12 +22,12 @@ BEGIN
     DECLARE v_hb_other_tobacco_consumed_6 VARCHAR(32);
     DECLARE v_hb_other_tobacco_consumed_7 VARCHAR(32);
 
-    SELECT IF(pa_v5.fu_tob_oth_stutrt_f4___1 = 1, CONCAT_WS(',', pa_v5.fu_tob_oth_stutrt_f4___1_label, ' '), ''),
-           IF(pa_v5.fu_tob_oth_stutrt_f4___2 = 1, CONCAT_WS(',', pa_v5.fu_tob_oth_stutrt_f4___2_label, ' '), ''),
-           IF(pa_v5.fu_tob_oth_stutrt_f4___3 = 1, CONCAT_WS(',', pa_v5.fu_tob_oth_stutrt_f4___3_label, ' '), ''),
-           IF(pa_v5.fu_tob_oth_stutrt_f4___4 = 1, CONCAT_WS(',', pa_v5.fu_tob_oth_stutrt_f4___4_label, ' '), ''),
-           IF(pa_v5.fu_tob_oth_stutrt_f4___5 = 1, CONCAT_WS(',', pa_v5.fu_tob_oth_stutrt_f4___5_label, ' '), ''),
-           IF(pa_v5.fu_tob_oth_stutrt_f4___6 = 1, CONCAT_WS(',', pa_v5.fu_tob_oth_stutrt_f4___6_label, ' '), ''),
+    SELECT IF(pa_v5.fu_tob_oth_stutrt_f4___1 = 1, pa_v5.fu_tob_oth_stutrt_f4___1_label, ''),
+           IF(pa_v5.fu_tob_oth_stutrt_f4___2 = 1, pa_v5.fu_tob_oth_stutrt_f4___2_label, ''),
+           IF(pa_v5.fu_tob_oth_stutrt_f4___3 = 1, pa_v5.fu_tob_oth_stutrt_f4___3_label, ''),
+           IF(pa_v5.fu_tob_oth_stutrt_f4___4 = 1, pa_v5.fu_tob_oth_stutrt_f4___4_label, ''),
+           IF(pa_v5.fu_tob_oth_stutrt_f4___5 = 1, pa_v5.fu_tob_oth_stutrt_f4___5_label, ''),
+           IF(pa_v5.fu_tob_oth_stutrt_f4___6 = 1, pa_v5.fu_tob_oth_stutrt_f4___6_label, ''),
            IF(pa_v5.fu_tob_oth_stutrt_f4___7 = 1, pa_v5.fu_other_tbc_use_f4, '')
     INTO v_hb_other_tobacco_consumed_1,
         v_hb_other_tobacco_consumed_2,
@@ -39,8 +38,9 @@ BEGIN
         v_hb_other_tobacco_consumed_7
     FROM wrafu_pregnancy_assessments_4 pa_v5
     WHERE CAST(pa_v5.record_id as UNSIGNED) = p_record_id;
-
-    SET v_hb_other_tobacco_consumed_v5 = CONCAT(
+    -- transform activated options into immutable list
+    SET @v_other_tobacco_consumed_v5 = CONCAT_WS(
+            ',',
             v_hb_other_tobacco_consumed_1,
             v_hb_other_tobacco_consumed_2,
             v_hb_other_tobacco_consumed_3,
@@ -48,8 +48,8 @@ BEGIN
             v_hb_other_tobacco_consumed_5,
             v_hb_other_tobacco_consumed_6,
             v_hb_other_tobacco_consumed_7);
-    SET v_hb_other_tobacco_consumed_v5 = TRIM(',' FROM TRIM(v_hb_other_tobacco_consumed_v5));
-
+    SET @v_other_tobacco_consumed_v5 = TRIM(',' FROM TRIM(@v_other_tobacco_consumed_v5));
+    SET v_hb_other_tobacco_consumed_v5 = REGEXP_REPLACE(@v_other_tobacco_consumed_v5, ',', CONCAT(',', SPACE(1)));
     RETURN v_hb_other_tobacco_consumed_v5;
 END $$
 DELIMITER ;
