@@ -50,6 +50,8 @@ BEGIN
         ELSEIF v_estimated_lmp_flag = 2 THEN
             SET v_estimated_lmp = DATE_SUB(v_current_visit_date, INTERVAL v_lmp_years YEAR);
         END IF;
+    ELSE
+        RETURN NULL;
     END IF;
 
     RETURN v_estimated_lmp;
