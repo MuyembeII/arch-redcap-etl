@@ -12,6 +12,7 @@ CREATE TABLE arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview
     visit_date                                 DATE           NOT NULL,
     /* WRA New Pregnancy*/
     pregnancy_id                               VARCHAR(32),
+    upt_result                                 ENUM ('Negative', 'Positive'),
     zapps_enrollment_status                    VARCHAR(32),
     zapps_ptid                                 VARCHAR(16),
     zapps_ptid_source                          VARCHAR(16),
@@ -32,7 +33,7 @@ CREATE TABLE arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview
     drugs_consumed_during_pregnancy            TINYTEXT,
     /* WRA ZAPPS Referrals */
     zapps_referral_outcome                     ENUM ('Declined', 'Accepted'),
-    zapps_referral_declined_reasons            TINYTEXT,
+    zapps_referral_declined_reasons            TEXT,
     preferred_zapps_clinic                     VARCHAR(32),
     preferred_zapps_appointment_date           DATE,
     pregnancy_identifier                       TINYTEXT,
@@ -48,7 +49,8 @@ CREATE UNIQUE INDEX pa_1_record_id_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_
 CREATE UNIQUE INDEX pa_1_wra_ptid_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (wra_ptid);
 CREATE INDEX pa_1_visit_number_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (visit_number);
 CREATE INDEX pa_1_visit_name_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (visit_name);
-CREATE INDEX pa_1_pregnancy_id_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (pregnancy_id);
+CREATE UNIQUE INDEX pa_1_pregnancy_id_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (pregnancy_id);
+CREATE INDEX pa_1_upt_result_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (upt_result);
 CREATE INDEX pa_1_pregnancy_identified_by_arch_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (pregnancy_identified_by_arch);
 CREATE INDEX pa_1_pregnancy_has_antenatal_care_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (pregnancy_has_antenatal_care);
 CREATE INDEX pa_1_anc_attendance_plan_idx ON arch_etl_db.crt_wra_visit_1_pregnancy_assessments_overview (anc_attendance_plan);
