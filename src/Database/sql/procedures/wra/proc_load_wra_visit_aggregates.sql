@@ -50,7 +50,7 @@ BEGIN
         LEFT JOIN crt_wra_adverse_events sae ON v.record_id = sae.record_id
     SET v.first_follow_up_visit_outcome = 'Deceased'
     WHERE MATCH (primary_adverse_event, outcome_of_sae) AGAINST ('+Death' IN BOOLEAN MODE)
-    AND sae.visit_number = 2.0;
+      AND sae.visit_number = 2.0;
 
     -- FU1: WRA Study Closure
     UPDATE crt_visit_aggregates v
@@ -67,13 +67,15 @@ BEGIN
     UPDATE crt_visit_aggregates v
         LEFT JOIN outmigration om ON v.record_id = om.record_id
     SET v.first_follow_up_visit_outcome = 'Out-Migration'
-    WHERE om.return_scorres REGEXP '^[0-9]*$' AND om.redcap_event_name = 'wra_followup_visit_arm_1';
+    WHERE om.return_scorres REGEXP '^[0-9]*$'
+      AND om.redcap_event_name = 'wra_followup_visit_arm_1';
 
     -- FU1: WRA Decline
     UPDATE crt_visit_aggregates v
         LEFT JOIN vw_wra_consent_overview co ON v.record_id = co.record_id
     SET v.first_follow_up_visit_outcome = 'Declined'
-    WHERE co.visit_number = 2.0 AND co.ongoing_consent_outcome = 'Declined';
+    WHERE co.visit_number = 2.0
+      AND co.ongoing_consent_outcome = 'Declined';
 
     -- FU1: WRA Decline
     UPDATE crt_visit_aggregates v
@@ -90,7 +92,9 @@ BEGIN
     UPDATE crt_visit_aggregates v
         LEFT JOIN crt_wra_visit_3_overview v2 ON v2.record_id = v.record_id
     SET v.second_follow_up_visit_outcome = v2.visit_outcome
-    WHERE v.wra_ptid = v2.wra_ptid;
+    WHERE v.wra_ptid = v2.wra_ptid
+      AND v.record_id NOT IN
+          (SELECT sc.record_id FROM crt_wra_study_closure sc WHERE sc.visit_number IN (1.0, 2.0));
 
     -- FU2: Missed Follow-Ups
     UPDATE crt_visit_aggregates v
@@ -119,13 +123,15 @@ BEGIN
     UPDATE crt_visit_aggregates v
         LEFT JOIN outmigration om ON v.record_id = om.record_id
     SET v.second_follow_up_visit_outcome = 'Out-Migration'
-    WHERE om.return_scorres REGEXP '^[0-9]*$' AND om.redcap_event_name = 'wra_followup_visit_arm_1b';
+    WHERE om.return_scorres REGEXP '^[0-9]*$'
+      AND om.redcap_event_name = 'wra_followup_visit_arm_1b';
 
     -- FU2: WRA Decline
     UPDATE crt_visit_aggregates v
         LEFT JOIN vw_wra_consent_overview co ON v.record_id = co.record_id
     SET v.second_follow_up_visit_outcome = 'Declined'
-    WHERE co.visit_number = 3.0 AND co.ongoing_consent_outcome = 'Declined';
+    WHERE co.visit_number = 3.0
+      AND co.ongoing_consent_outcome = 'Declined';
 
     -- FU2: WRA Decline
     UPDATE crt_visit_aggregates v
@@ -143,7 +149,8 @@ BEGIN
         LEFT JOIN crt_wra_visit_4_overview v4 ON v4.record_id = v.record_id
     SET v.third_follow_up_visit_outcome = v4.visit_outcome
     WHERE v.wra_ptid = v4.wra_ptid
-      AND v.record_id NOT IN (SELECT sc.record_id FROM crt_wra_study_closure sc);
+      AND v.record_id NOT IN
+          (SELECT sc.record_id FROM crt_wra_study_closure sc WHERE sc.visit_number IN (1.0, 2.0, 3.0));
 
     -- FU3: Missed Follow-Ups
     UPDATE crt_visit_aggregates v
@@ -178,13 +185,15 @@ BEGIN
     UPDATE crt_visit_aggregates v
         LEFT JOIN outmigration om ON v.record_id = om.record_id
     SET v.third_follow_up_visit_outcome = 'Out-Migration'
-    WHERE om.return_scorres REGEXP '^[0-9]*$' AND om.redcap_event_name = 'wra_followup_visit_arm_1c';
+    WHERE om.return_scorres REGEXP '^[0-9]*$'
+      AND om.redcap_event_name = 'wra_followup_visit_arm_1c';
 
     -- FU3: WRA Decline
     UPDATE crt_visit_aggregates v
         LEFT JOIN vw_wra_consent_overview co ON v.record_id = co.record_id
     SET v.third_follow_up_visit_outcome = 'Declined'
-    WHERE co.visit_number = 4.0 AND co.ongoing_consent_outcome = 'Declined';
+    WHERE co.visit_number = 4.0
+      AND co.ongoing_consent_outcome = 'Declined';
 
     -- FU3: WRA Decline
     UPDATE crt_visit_aggregates v
@@ -242,13 +251,15 @@ BEGIN
     UPDATE crt_visit_aggregates v
         LEFT JOIN outmigration om ON v.record_id = om.record_id
     SET v.fourth_follow_up_visit_outcome = 'Out-Migration'
-    WHERE om.return_scorres REGEXP '^[0-9]*$' AND om.redcap_event_name = 'wra_followup_visit_arm_1d';
+    WHERE om.return_scorres REGEXP '^[0-9]*$'
+      AND om.redcap_event_name = 'wra_followup_visit_arm_1d';
 
     -- FU4: WRA Decline
     UPDATE crt_visit_aggregates v
         LEFT JOIN vw_wra_consent_overview co ON v.record_id = co.record_id
     SET v.fourth_follow_up_visit_outcome = co.ongoing_consent_outcome
-    WHERE co.visit_number = 5.0 AND co.ongoing_consent_outcome = 'Declined';
+    WHERE co.visit_number = 5.0
+      AND co.ongoing_consent_outcome = 'Declined';
 
     -- FU4: WRA Decline
     UPDATE crt_visit_aggregates v
@@ -315,13 +326,15 @@ BEGIN
     UPDATE crt_visit_aggregates v
         LEFT JOIN outmigration om ON v.record_id = om.record_id
     SET v.fifth_follow_up_visit_outcome = 'Out-Migration'
-    WHERE om.return_scorres REGEXP '^[0-9]*$' AND om.redcap_event_name = 'wra_followup_visit_arm_1e';
+    WHERE om.return_scorres REGEXP '^[0-9]*$'
+      AND om.redcap_event_name = 'wra_followup_visit_arm_1e';
 
     -- FU5: WRA Decline
     UPDATE crt_visit_aggregates v
         LEFT JOIN vw_wra_consent_overview co ON v.record_id = co.record_id
     SET v.fifth_follow_up_visit_outcome = co.ongoing_consent_outcome
-    WHERE co.visit_number = 6.0 AND co.ongoing_consent_outcome = 'Declined';
+    WHERE co.visit_number = 6.0
+      AND co.ongoing_consent_outcome = 'Declined';
 
     -- FU5: WRA Decline
     UPDATE crt_visit_aggregates v
