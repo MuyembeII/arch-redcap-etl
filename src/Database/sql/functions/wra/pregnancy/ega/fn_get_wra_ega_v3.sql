@@ -23,6 +23,8 @@ BEGIN
     DECLARE v_ega NUMERIC(4, 1);
     DECLARE v_current_visit_date DATE;
     DECLARE v_fu_lmp_date DATE;
+    DECLARE v_ega_weeks SMALLINT;
+    DECLARE v_ega_days_remainder SMALLINT;
 
     SELECT COALESCE(ps_v3.ps_fu_visit_date_f2, v3.visit_date),
            IF(ps_v3.fu_lmp_start_scorres_f2 = 1, ps_v3.fu_lmp_scdat_f2, getEstimated_LMP_V1(p_record_id))
@@ -36,11 +38,11 @@ BEGIN
         -- Calculate the total number of days between the LMP date and the current visit date
         SET @ega_days_difference = DATEDIFF(v_current_visit_date, v_fu_lmp_date);
         -- Calculate the number of full weeks, integer division in SQL automatically floors the result
-        SET @ega_weeks = @ega_days_difference / 7;
+        SET v_ega_weeks = FLOOR(@ega_days_difference / 7);
         -- Calculate the remaining number of days
-        SET @ega_remainder_days = @ega_days_difference % 7;
+        SET v_ega_days_remainder = MOD(@ega_days_difference, 7);
         -- Merge week(s) and day(s) into final EGA result
-        SET v_ega = CAST(CONCAT_WS('.', @ega_weeks, @ega_remainder_days) as DOUBLE);
+        SET v_ega = CAST(CONCAT_WS('.', v_ega_weeks, v_ega_days_remainder) as DOUBLE);
     ELSE
         RETURN NULL;
     END IF;
