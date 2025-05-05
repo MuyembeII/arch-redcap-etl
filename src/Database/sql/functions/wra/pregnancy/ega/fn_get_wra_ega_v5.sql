@@ -25,14 +25,12 @@ BEGIN
     DECLARE v_fu_lmp_date DATE;
     DECLARE v_ega_weeks SMALLINT;
     DECLARE v_ega_days_remainder SMALLINT;
-
     SELECT COALESCE(ps_v5.ps_fu_visit_date_f4, v5.visit_date),
            IF(ps_v5.fu_lmp_start_scorres_f4 = 1, ps_v5.fu_lmp_scdat_f4, getEstimated_LMP_V1(p_record_id))
     INTO v_current_visit_date, v_fu_lmp_date
     FROM wrafu_pregnancy_surveillance_4 ps_v5
              JOIN arch_etl_db.crt_wra_visit_5_overview v5 on ps_v5.record_id = v5.record_id
     WHERE ps_v5.record_id = p_record_id;
-
     -- LMP date cannot be in the future.
     IF v_fu_lmp_date IS NOT NULL AND v_fu_lmp_date <= v_current_visit_date THEN
         -- Calculate the total number of days between the LMP date and the current visit date
@@ -46,7 +44,6 @@ BEGIN
     ELSE
         RETURN NULL;
     END IF;
-
     RETURN v_ega;
 END $$
 

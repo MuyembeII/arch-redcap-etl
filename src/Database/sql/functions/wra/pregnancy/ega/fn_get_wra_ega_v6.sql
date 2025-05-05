@@ -13,9 +13,9 @@
  * @return DOUBLE | Week(s) and Day(s)
  * @see https://github.com/GITmarvel/EDD-and-EGA-calculation
  */
-DROP FUNCTION IF EXISTS `getEstimatedGestationalAge_V5`;
+DROP FUNCTION IF EXISTS `getEstimatedGestationalAge_V6`;
 DELIMITER $$
-CREATE FUNCTION arch_etl_db.getEstimatedGestationalAge_V5(p_record_id BIGINT)
+CREATE FUNCTION arch_etl_db.getEstimatedGestationalAge_V6(p_record_id BIGINT)
     RETURNS DOUBLE
     READS SQL DATA
     DETERMINISTIC
@@ -25,14 +25,12 @@ BEGIN
     DECLARE v_fu_lmp_date DATE;
     DECLARE v_ega_weeks SMALLINT;
     DECLARE v_ega_days_remainder SMALLINT;
-
     SELECT COALESCE(ps_v6.ps_fu_visit_date_f5, v6.visit_date),
            IF(ps_v6.fu_lmp_start_scorres_f5 = 1, ps_v6.fu_lmp_scdat_f5, getEstimated_LMP_V1(p_record_id))
     INTO v_current_visit_date, v_fu_lmp_date
     FROM wrafu_pregnancy_surveillance_6 ps_v6
              JOIN arch_etl_db.crt_wra_visit_6_overview v6 on ps_v6.record_id = v6.record_id
     WHERE ps_v6.record_id = p_record_id;
-
     -- LMP date cannot be in the future.
     IF v_fu_lmp_date IS NOT NULL AND v_fu_lmp_date <= v_current_visit_date THEN
         -- Calculate the total number of days between the LMP date and the current visit date
@@ -46,7 +44,6 @@ BEGIN
     ELSE
         RETURN NULL;
     END IF;
-
     RETURN v_ega;
 END $$
 
