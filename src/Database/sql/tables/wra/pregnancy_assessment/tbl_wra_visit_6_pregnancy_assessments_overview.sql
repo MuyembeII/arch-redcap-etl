@@ -12,6 +12,7 @@ CREATE TABLE arch_etl_db.crt_wra_visit_6_pregnancy_assessments_overview
     visit_date                                 DATE           NOT NULL,
     /* WRA New Pregnancy*/
     pregnancy_id                               VARCHAR(32),
+    upt_result                                 ENUM ('Negative', 'Positive'),
     zapps_enrollment_status                    VARCHAR(32),
     zapps_ptid                                 VARCHAR(16),
     zapps_ptid_source                          VARCHAR(16),
