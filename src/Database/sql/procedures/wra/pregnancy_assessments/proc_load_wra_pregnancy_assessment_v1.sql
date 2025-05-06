@@ -6,7 +6,6 @@
  * @alias Load WRA Pregnancy Assessment Baseline
  */
 DROP PROCEDURE IF EXISTS `Load_WRA_Pregnancy_Assessment_Overview_V1`;
-
 DELIMITER $$
 CREATE PROCEDURE Load_WRA_Pregnancy_Assessment_Overview_V1()
 BEGIN
@@ -52,25 +51,29 @@ BEGIN
     FROM crt_wra_visit_1_overview v1
     WHERE v1.record_id IN (SELECT DISTINCT a.record_id
                            FROM wra_pregnancy_assessments a
-                           WHERE (a.np_zapps_scorres IS NOT NULL OR a.np_anc_mhyn IS NOT NULL) AND a.name_veri IS NOT NULL)
+                           WHERE (a.np_zapps_scorres IS NOT NULL OR a.np_anc_mhyn IS NOT NULL)
+                             AND a.name_veri IS NOT NULL)
     ORDER BY v1.visit_date DESC;
 
     UPDATE crt_wra_visit_1_pregnancy_assessments_overview v1
         LEFT JOIN wra_pregnancy_assessments pa ON v1.record_id = pa.record_id
         LEFT JOIN crt_wra_point_of_collection_overview poc ON v1.record_id = poc.record_id
-    SET v1.visit_date                                = COALESCE(pa.pa_visit_date, v1.visit_date),
-        v1.pregnancy_id                              = poc.pregnancy_id,
-        v1.zapps_enrollment_status                   = pa.np_zapps_scorres_label,
-        v1.zapps_ptid                                = useAutoTrimmer(pa.np_zapps_ptid),
-        v1.zapps_ptid_source                         = pa.np_zapps_id_src_label,
-        v1.pregnancy_identified_by_arch              = IF(pa.np_ident_arch = 1, 'Yes',
-                                                          IF(pa.np_ident_arch = 0, 'No', pa.np_ident_arch)),
-        v1.pregnancy_has_antenatal_care              = IF(pa.np_anc_mhyn = 1, 'Yes',
-                                                          IF(pa.np_anc_mhyn = 0, 'No', pa.np_anc_mhyn)),
-        v1.anc_visit_count                           = CAST(pa.np_anc_num_mh AS UNSIGNED),
-        v1.anc_attendance_plan                       = IF(pa.np_anc_plan_obsloc = 1, 'Yes',
-                                                          IF(pa.np_anc_plan_obsloc = 0, 'No', pa.np_anc_plan_obsloc)),
-        v1.planned_place_for_birth                   = (
+        LEFT JOIN wra_pregnancy_overview_and_surveillance pos ON v1.record_id = pos.record_id
+    SET v1.visit_date                                 = COALESCE(pa.pa_visit_date, v1.visit_date),
+        v1.pregnancy_id                               = poc.pregnancy_id,
+        v1.upt_result                                 = IF(poc.upt_result IS NULL OR poc.upt_result = '', NULL,
+                                                           poc.upt_result),
+        v1.zapps_enrollment_status                    = pa.np_zapps_scorres_label,
+        v1.zapps_ptid                                 = useAutoTrimmer(pa.np_zapps_ptid),
+        v1.zapps_ptid_source                          = pa.np_zapps_id_src_label,
+        v1.pregnancy_identified_by_arch               = IF(pa.np_ident_arch = 1, 'Yes',
+                                                           IF(pa.np_ident_arch = 0, 'No', pa.np_ident_arch)),
+        v1.pregnancy_has_antenatal_care               = IF(pa.np_anc_mhyn = 1, 'Yes',
+                                                           IF(pa.np_anc_mhyn = 0, 'No', pa.np_anc_mhyn)),
+        v1.anc_visit_count                            = CAST(pa.np_anc_num_mh AS UNSIGNED),
+        v1.anc_attendance_plan                        = IF(pa.np_anc_plan_obsloc = 1, 'Yes',
+                                                           IF(pa.np_anc_plan_obsloc = 0, 'No', pa.np_anc_plan_obsloc)),
+        v1.planned_place_for_birth                    = (
             CASE
                 WHEN pa.birth_plan_fac_obsloc = 1 THEN pa.facility_other_label
                 WHEN pa.birth_plan_fac_obsloc = 2 THEN pa.birth_plan_fac_obsloc_label
@@ -79,28 +82,40 @@ BEGIN
                 END
             ),
 
-        v1.place_for_birth_planner                   = (
+        v1.place_for_birth_planner                    = (
             CASE
                 WHEN pa.np_del_decide_scorres BETWEEN 1 AND 5 THEN pa.np_del_decide_scorres_label
                 WHEN pa.birth_plan_fac_obsloc = 88 THEN UCASE(useAutoTrimmer(pa.del_decide_spfy_scorres))
                 ELSE NULLIF(pa.np_del_decide_scorres, NULL)
                 END
             ),
-        v1.alcoholic_consumption_during_pregnancy    = IF(pa.np_alc_suyn = 1, 'Yes',
-                                                          IF(pa.np_alc_suyn = 0, 'No', pa.np_alc_suyn)),
-        v1.alcoholic_consumption_frequency           = pa.np_alc_cons_label,
-        v1.tobacco_consumption_during_pregnancy      = IF(pa.np_tob_suyn = 1, 'Yes',
-                                                          IF(pa.np_tob_suyn = 0, 'No', pa.np_tob_suyn)),
-        v1.tobacco_consumption_frequency             = pa.np_tob_cur_sudosfrq_label,
-        v1.other_tobacco_consumption_during_pregnancy = '',
-        v1.street_drugs_consumption_during_pregnancy = IF(pa.np_drug_suyn = 1, 'Yes',
-                                                          IF(pa.np_drug_suyn = 0, 'No', pa.np_drug_suyn)),
-        v1.street_drug_consumption_frequency         = pa.np_drug_usage_label,
-        v1.zapps_referral_acceptance                 = IF(pa.ref_likely_scorres = 1, 'Yes',
-                                                          IF(pa.ref_likely_scorres = 0, 'No', pa.ref_likely_scorres)),
-        v1.preferred_zapps_clinic                    = pa.pref_zapps_scorres_label
+        v1.alcoholic_consumption_during_pregnancy     = IF(pa.np_alc_suyn = 1, 'Yes',
+                                                           IF(pa.np_alc_suyn = 0, 'No', pa.np_alc_suyn)),
+        v1.alcoholic_consumption_frequency            = pa.np_alc_cons_label,
+        v1.tobacco_consumption_during_pregnancy       = IF(pa.np_tob_suyn = 1, 'Yes',
+                                                           IF(pa.np_tob_suyn = 0, 'No', pa.np_tob_suyn)),
+        v1.tobacco_consumption_frequency              = pa.np_tob_cur_sudosfrq_label,
+        v1.other_tobacco_consumption_during_pregnancy = use_OtherTobaccoConsumedTransformer_V1(pa.record_id),
+        v1.street_drugs_consumption_during_pregnancy  = IF(pa.np_drug_suyn = 1, 'Yes',
+                                                           IF(pa.np_drug_suyn = 0, 'No', pa.np_drug_suyn)),
+        v1.street_drug_consumption_frequency          = pa.np_drug_usage_label,
+        v1.drugs_consumed_during_pregnancy            = useOtherDrugsConsumedTransformer_V1(pa.record_id),
+        v1.zapps_referral_outcome                     = IF(pa.ref_likely_scorres = 1, 'Accepted',
+                                                           IF(pa.ref_likely_scorres = 0, 'Declined', pa.ref_likely_scorres)),
+        v1.zapps_referral_declined_reasons            = use_ZAPPS_RefDeclinedReasonsTransformer_V1(pa.record_id),
+        v1.preferred_zapps_clinic                     = pa.pref_zapps_scorres_label,
+        v1.preferred_zapps_appointment_date           = pa.apnt_dat_scorres,
+        v1.pregnancy_identifier                       = pos.np_pregid_mhyn_label,
+        v1.first_positive_upt_date                    = COALESCE(getFirstPositive_UPT_Date_V1(pos.record_id),
+                                                                 poc.visit_date, v1.visit_date),
+        v1.first_ultra_sound_date                     = use_ISO_DateTrimmer(TRIM(pos.np_us_test_dat)),
+        v1.first_ultra_sound_by_edd                   = pos.np_us_edd_dat,
+        v1.lmp_date                                   = COALESCE(pos.lmp_scdat, getEstimated_LMP_V1(pa.record_id)),
+        v1.ega_by_lmp                                 = getEstimatedGestationalAge_V1(pos.record_id),
+        v1.edd_by_ega                                 = getEstimatedDateOfDelivery_V1(pa.record_id),
+        v1.zapps_referral_comments                    = pa.zr_comm
     WHERE v1.record_id = pa.record_id
-      AND poc.visit_number = v1.visit_number AND poc.upt_result = 'Positive';
+      AND poc.visit_number = v1.visit_number;
     COMMIT;
 
     -- Process Metrics
@@ -112,3 +127,5 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
