@@ -18,7 +18,7 @@ BEGIN
             ROLLBACK;
             GET DIAGNOSTICS CONDITION 1 @sqlstate = RETURNED_SQLSTATE, @errno = MYSQL_ERRNO, @text = MESSAGE_TEXT;
             SET @full_error =
-                    CONCAT_WS('\n', 'ERROR - Failed to load FU-2 WRA Pregnancy Outcome Assessments;', @errno, '(',
+                    CONCAT_WS('\n', 'ERROR - Failed to load FU-3 WRA Pregnancy Outcome Assessments;', @errno, '(',
                               @sqlstate, '):',
                               @text);
             SELECT @full_error;
@@ -47,7 +47,7 @@ BEGIN
            v3.visit_date
     FROM crt_wra_visit_3_overview v3
     WHERE v3.visit_outcome = 'Completed'
-      AND v3.record_id IN (SELECT a.record_id FROM wrafu_pregnancy_assessments_2 a WHERE a.poa_ant_att_f2 IS NOT NULL)
+      AND v3.record_id IN (SELECT a.record_id FROM wrafu_pregnancy_assessments_2 a WHERE a.pa_fu_visit_date_f2 IS NOT NULL)
     GROUP BY v3.visit_date, v3.screening_id
     ORDER BY v3.visit_date DESC;
 
@@ -72,7 +72,7 @@ BEGIN
         v3.pregnancy_delivery_date    = poa_v3.poa_pregdev_date_f2,
         v3.weeks_pregnancy_delivered  = poa_v3.poa_pregdev_dur_weeks_f2,
         v3.months_pregnancy_delivered = poa_v3.poa_pregdev_dur_months_f2
-    WHERE poa_v3.poa_ant_preg_f2 IN (0, 1);
+    WHERE poa_v3.pa_fu_visit_date_f2 IS NOT NULL;
     COMMIT;
 
     -- flag completion

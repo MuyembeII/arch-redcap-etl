@@ -84,8 +84,8 @@ BEGIN
         LEFT JOIN crt_wra_point_of_collection_overview poc ON v2.record_id = poc.record_id
     SET v2.last_upt_result             = poc.upt_result,
         v2.last_pregnancy_id           = poc.pregnancy_id,
-        v2.last_zapps_referral_outcome = IF(pa_v1.zapps_referral_acceptance = 'Yes', 'Accepted',
-                                            IF(pa_v1.zapps_referral_acceptance = 'No', 'Declined', NULL)),
+        v2.last_zapps_referral_outcome = IF(pa_v1.zapps_referral_outcome = 'Yes', 'Accepted',
+                                            IF(pa_v1.zapps_referral_outcome = 'No', 'Declined', NULL)),
         v2.zapps_enrollment_status     = pa_v1.zapps_enrollment_status,
         v2.zapps_ptid                  = pa_v1.zapps_ptid
     WHERE poc.visit_number = 2.0;

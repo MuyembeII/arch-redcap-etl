@@ -75,13 +75,6 @@ BEGIN
     WHERE v1.visit_id = 1
     ORDER BY v1.screening_date DESC;
 
-    UPDATE crt_wra_visit_1_overview o1
-        LEFT JOIN wra_forms_repeating_instruments v1 ON o1.alternate_id = v1.wra_forms_repeating_instruments_id
-    SET o1.ra = 'jdaka'
-    WHERE o1.ra = 'gmuyembe' AND v1.wra_ra_name LIKE '%Daka%'
-      AND o1.record_id = v1.record_id;
-
-
     COMMIT;
 
     -- flag completion

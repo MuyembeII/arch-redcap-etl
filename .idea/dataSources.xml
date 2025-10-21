@@ -8,18 +8,11 @@
       <jdbc-url>jdbc:mariadb://localhost:3306/arch_etl_db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="ARCH-REDCap DB" uuid="e4cac53b-4602-41ed-8fa5-2da254ca232d">
+    <data-source source="LOCAL" name="ARCH OLD" uuid="c8d357cb-9c34-4d52-967f-e29e8b789209">
       <driver-ref>mariadb</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mariadb://localhost:3306/arch_etl_db</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
-    <data-source source="LOCAL" name="ARCH 1.0" uuid="e5fe28c3-811a-48e0-bd1d-9869703ddccb">
-      <driver-ref>mariadb</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mariadb://localhost:3306/arch_db</jdbc-url>
+      <jdbc-url>jdbc:mariadb://localhost:3306/arch</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

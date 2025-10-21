@@ -47,7 +47,7 @@ BEGIN
            v6.visit_date
     FROM crt_wra_visit_6_overview v6
     WHERE v6.visit_outcome = 'Completed'
-      AND v6.record_id IN (SELECT a.record_id FROM wrafu_pregnancy_assessments_5 a WHERE a.poa_ant_att_f5 IS NOT NULL)
+      AND v6.record_id IN (SELECT a.record_id FROM wrafu_pregnancy_assessments_5 a WHERE a.pa_fu_visit_date_f5 IS NOT NULL)
     GROUP BY v6.visit_date, v6.screening_id
     ORDER BY v6.visit_date DESC;
 
@@ -72,7 +72,7 @@ BEGIN
         v6.pregnancy_delivery_date    = poa_v6.poa_pregdev_date_f5,
         v6.weeks_pregnancy_delivered  = poa_v6.poa_pregdev_dur_weeks_f5,
         v6.months_pregnancy_delivered = poa_v6.poa_pregdev_dur_months_f5
-    WHERE poa_v6.poa_ant_preg_f5 IN (0, 1);
+    WHERE poa_v6.pa_fu_visit_date_f5 IS NOT NULL;
     COMMIT;
 
     -- flag completion

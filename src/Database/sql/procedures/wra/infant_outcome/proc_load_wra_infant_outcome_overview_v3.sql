@@ -10,7 +10,7 @@ DROP PROCEDURE IF EXISTS `Load_WRA_Infant_Outcome_Overview_V3`;
 DELIMITER $$
 CREATE PROCEDURE Load_WRA_Infant_Outcome_Overview_V3()
 BEGIN
-    -- Smart-Simple safe-guard procedure for logging.
+    -- Smart-Simple safeguard procedure for logging.
     DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING, NOT FOUND, 1062
         BEGIN
             SHOW WARNINGS;
