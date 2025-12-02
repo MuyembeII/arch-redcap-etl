@@ -590,7 +590,7 @@ CREATE TABLE arch_etl_db.arch_follow_up_4_visit_master
     sc_10                         TINYINT,
     sc_10_other                   VARCHAR(32),
     sc_11                         TINYINT,
-    sc_comm_yn                    BIT,
+    sc_comm_yn                    TINYTEXT,
     sc_comm                       TINYTEXT,
     PRIMARY KEY (id, record_id)
 );

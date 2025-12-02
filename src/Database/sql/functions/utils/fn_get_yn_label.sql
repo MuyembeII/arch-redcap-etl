@@ -16,8 +16,10 @@ BEGIN
     DECLARE v_yn_label VARCHAR(3);
     IF p_literal = 1 THEN
         SET v_yn_label = 'Yes';
-    ELSE
+    ELSEIF p_literal = 0 THEN
         SET v_yn_label = 'No';
+    ELSE
+        SET v_yn_label = NULL;
     END IF;
     RETURN v_yn_label;
 END $$

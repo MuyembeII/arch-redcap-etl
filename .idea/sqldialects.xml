@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/arch_baseline_visit_master.sql" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/arch_fu_1_visit_master.sql" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/arch_fu_2_visit_master.sql" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/arch_fu_3_visit_master.sql" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/arch_fu_4_visit_master.sql" dialect="MariaDB" />
-    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/arch_fu_5_visit_master.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/arch_master_ds.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/ds_baseline_visit.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/ds_fu_1_visit.sql" dialect="MariaDB" />
@@ -14,6 +8,24 @@
     <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/ds_fu_3_visit.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/ds_fu_4_visit.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/ds_fu_5_visit.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/queries/ds_baseline_visit_v1.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/queries/ds_fu_1_visit_v1.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/queries/ds_fu_2_visit_v1.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/queries/ds_fu_3_visit_v1.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/queries/ds_fu_4_visit_v1.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/queries/ds_fu_5_visit_v1.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/tables/v0/arch_baseline_visit_master.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/tables/v0/arch_fu_1_visit_master.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/tables/v0/arch_fu_2_visit_master.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/tables/v0/arch_fu_3_visit_master.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/tables/v0/arch_fu_4_visit_master.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/tables/v0/arch_fu_5_visit_master.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/tables/v1/arch_baseline_visit_master_v1.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/tables/v1/arch_fu_1_visit_master_v1.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/tables/v1/arch_fu_2_visit_master_v1.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/tables/v1/arch_fu_3_visit_master_v1.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/tables/v1/arch_fu_4_visit_master_v1.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/analysis/tables/v1/arch_fu_5_visit_master_v1.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/src/Database/sql/functions/crt/fn_get_wra_complete_visit_total.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/src/Database/sql/functions/crt/fn_get_wra_incomplete_visit_total.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/src/Database/sql/functions/crt/fn_get_wra_missed_visit_total.sql" dialect="MariaDB" />
@@ -21,6 +33,7 @@
     <file url="file://$PROJECT_DIR$/src/Database/sql/functions/household/fn_get_hh_handwash_cleansing_agent_v1.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/src/Database/sql/functions/household/fn_get_hh_member_assets_v1.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/src/Database/sql/functions/household/fn_get_wra_hh_screening_id.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/Database/sql/functions/utils/fn_auto_choice_trim.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/src/Database/sql/functions/utils/fn_auto_trim.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/src/Database/sql/functions/utils/fn_cap_first.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/src/Database/sql/functions/utils/fn_free_text_trim.sql" dialect="MariaDB" />

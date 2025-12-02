@@ -869,4 +869,3 @@ SET am.sc_1        = sc.sc_1
   , am.sc_comm_yn  = sc.sc_comm_yn
   , am.sc_comm     = sc.sc_comm
 WHERE sc.redcap_event_name = 'wra_baseline_arm_1';
-

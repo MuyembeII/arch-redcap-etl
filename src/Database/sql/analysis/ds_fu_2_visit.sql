@@ -244,7 +244,9 @@ INSERT INTO arch_etl_db.arch_follow_up_2_visit_master( id
                                                      , ps_mens_cal_yn
                                                      , lmp_dt_rec_cal
                                                      , preg_scorres
+                                                     , ps_preg_dur
                                                      , months_preg_scorres
+                                                     , weeks_preg_scorres
                                                      , np_pregid_mhyn
                                                      , np_date_of_test
                                                      , np_date_of_test_2
@@ -267,7 +269,8 @@ INSERT INTO arch_etl_db.arch_follow_up_2_visit_master( id
                                                      , ps_fu_danger_signs_7
                                                      , ps_preg_times
                                                      , preg_surv_comm
-                                                     , preg_surv_commnts)
+                                                     , preg_surv_commnts
+                                                     )
 SELECT v3.alternate_id                             as id
      , v3.record_id
      , v3.visit_number
@@ -498,43 +501,45 @@ SELECT v3.alternate_id                             as id
      , mha.sa_zassessment_result
      , mha.pss_coyn
      , mha.ss_comments
-     , ps.fu_lmp_reg_scorres_f2                    as lmp_reg_scorres
-     , ps.fu_lmp_kd_scorres_f2                     as lmp_kd_scorres
-     , ps.lmp_kd_scorres_othr_f2                   as lmp_kd_scorres_other
-     , ps.fu_lmp_start_scorres_f2                  as lmp_start_scorres
-     , ps.fu_lmp_scdat_f2                          as lmp_scdat
-     , ps.fu_lmp_cat_scorres_f2                    as lmp_cat_scorres
-     , ps.fu_lmp_start_weeks_f2                    as lmp_start_weeks
-     , ps.fu_lmp_start_months_f2                   as lmp_start_months
-     , ps.fu_lmp_start_years_f2                    as lmp_start_years
-     , ps.fu_lmp_scorres_f2                        as lmp_scorres
-     , ps.fu_ps_mens_cal_yn_f2                     as ps_mens_cal_yn
-     , ps.fu_lmp_dt_rec_cal_f2                     as lmp_dt_rec_cal
-     , ps.fu_preg_scorres_f2                       as preg_scorres
-     , ps.fu_month_preg_scorres_f2                 as months_preg_scorres
-     , ps.fu_np_pregid_mhyn_f2                     as np_pregid_mhyn
-     , ps.fu_np_date_of_test_f2                    as np_date_of_test
-     , ps.fu_np_date_of_test_2_f2                  as np_date_of_test_2
-     , ps.fu_np_us_test_dat_f2                     as np_us_test_dat
-     , ps.fu_np_bld_test_dat_f2                    as np_bld_test_dat
-     , ps.ps_fu_pregnancy_id_f2                    as ps_pregnancy_id
-     , ps.fu_np_us_edd_dat_f2                      as np_us_edd_dat
-     , ps.fu_np_edd_src_f2                         as np_edd_src
-     , ps.ps_fu_last_upt_f2                        as ps_fu_last_upt
-     , ps.ps_fu_zapps_enr_f2                       as ps_fu_zapps_enr
-     , ps.ps_fu_pregnancy_id_f2                    as ps_fu_pregnancy_id
-     , ps.ps_preg_last_visit_f2                    as ps_preg_last_visit
-     , ps.ps_same_preg_lv_f2                       as ps_same_preg_lv
-     , ps.ps_fu_danger_signs_f2___1                as ps_fu_danger_signs___1
-     , ps.ps_fu_danger_signs_f2___2                as ps_fu_danger_signs___2
-     , ps.ps_fu_danger_signs_f2___3                as ps_fu_danger_signs___3
-     , ps.ps_fu_danger_signs_f2___4                as ps_fu_danger_signs___4
-     , ps.ps_fu_danger_signs_f2___5                as ps_fu_danger_signs___5
-     , ps.ps_fu_danger_signs_f2___6                as ps_fu_danger_signs___6
-     , ps.ps_fu_danger_signs_f2___7                as ps_fu_danger_signs___7
-     , ps.ps_preg_times_f2                         as ps_preg_times
-     , ps.fu_preg_surv_comm_yn_f2                  as preg_surv_comm
-     , ps.fu_preg_surv_comm_f2                     as preg_surv_commnts
+     , get_YN_Label(ps.fu_lmp_reg_scorres_f2)                                                        as lmp_reg_scorres
+     , IF(ps.fu_lmp_kd_scorres_f2 = 96, TRIM(ps.lmp_kd_scorres_othr_f2), fu_lmp_kd_scorres_f2_label) as lmp_kd_scorres
+     , TRIM(ps.lmp_kd_scorres_othr_f2)                                                               as lmp_kd_scorres_other
+     , get_YN_Label(ps.fu_lmp_start_scorres_f2)                                                      as lmp_start_scorres
+     , ps.fu_lmp_scdat_f2                                                                            as lmp_scdat
+     , useAutoChoiceTrimmer(ps.fu_lmp_cat_scorres_f2)                                                as lmp_cat_scorres
+     , ps.fu_lmp_start_weeks_f2                                                                      as lmp_start_weeks
+     , ps.fu_lmp_start_months_f2                                                                     as lmp_start_months
+     , ps.fu_lmp_start_years_f2                                                                      as lmp_start_years
+     , get_YN_Label(ps.fu_lmp_scorres_f2)                                                            as lmp_scorres
+     , get_YN_Label(ps.fu_ps_mens_cal_yn_f2)                                                         as ps_mens_cal_yn
+     , get_YN_Label(ps.fu_lmp_dt_rec_cal_f2)                                                         as lmp_dt_rec_cal
+     , ps.fu_preg_scorres_f2_label                                                                   as preg_scorres
+     , useAutoChoiceTrimmer(ps.ps_fu_preg_dur_f2_label)                                              as ps_preg_dur
+     , ps.fu_month_preg_scorres_f2                                                                   as months_preg_scorres
+     , ps.fu_weeks_preg_scorres_f2                                                                   as weeks_preg_scorres
+     , ps.fu_np_pregid_mhyn_f2_label                                                                 as np_pregid_mhyn
+     , ps.fu_np_date_of_test_f2                                                                      as np_date_of_test
+     , ps.fu_np_date_of_test_2_f2                                                                    as np_date_of_test_2
+     , ps.fu_np_us_test_dat_f2                                                                       as np_us_test_dat
+     , ps.fu_np_bld_test_dat_f2                                                                      as np_bld_test_dat
+     , ps.ps_fu_pregnancy_id_f2                                                                      as ps_pregnancy_id
+     , ps.fu_np_us_edd_dat_f2                                                                        as np_us_edd_dat
+     , ps.fu_np_edd_src_f2_label                                                                     as np_edd_src
+     , ps.ps_fu_last_upt_f2                                                                          as ps_fu_last_upt
+     , ps.ps_fu_zapps_enr_f2                                                                         as ps_fu_zapps_enr
+     , ps.ps_fu_pregnancy_id_f2                                                                      as ps_fu_pregnancy_id
+     , get_YN_Label(ps.ps_preg_last_visit_f2)                                                        as ps_preg_last_visit
+     , get_YN_Label(ps.ps_same_preg_lv_f2)                                                           as ps_same_preg_lv
+     , ps.ps_fu_danger_signs_f2___1_label                                                            as ps_fu_danger_signs___1
+     , ps.ps_fu_danger_signs_f2___2_label                                                            as ps_fu_danger_signs___2
+     , ps.ps_fu_danger_signs_f2___3_label                                                            as ps_fu_danger_signs___3
+     , ps.ps_fu_danger_signs_f2___4_label                                                            as ps_fu_danger_signs___4
+     , ps.ps_fu_danger_signs_f2___5_label                                                            as ps_fu_danger_signs___5
+     , ps.ps_fu_danger_signs_f2___6_label                                                            as ps_fu_danger_signs___6
+     , ps.ps_fu_danger_signs_f2___7_label                                                            as ps_fu_danger_signs___7
+     , ps.ps_preg_times_f2                                                                           as ps_preg_times
+     , get_YN_Label(ps.fu_preg_surv_comm_yn_f2)                                                      as preg_surv_comm
+     , useTextTransformer(ps.fu_preg_surv_comm_f2)
 FROM crt_wra_visit_3_overview v3
          LEFT JOIN wra_follow_up_visit_2_repeating_instruments f2
                    ON v3.alternate_id = f2.wra_follow_up_visit_2_repeating_instruments_id
@@ -542,233 +547,254 @@ FROM crt_wra_visit_3_overview v3
          LEFT JOIN wrafu_pregnancy_surveillance_2 ps ON v3.record_id = ps.record_id
 WHERE mha.redcap_event_name = 'wra_followup_visit_arm_1b';
 
+UPDATE arch_follow_up_2_visit_master wra
+    LEFT JOIN arch_etl_db.crt_wra_visit_4_overview v4 ON wra.record_id = v4.record_id
+SET wra.wra_age = v4.age
+WHERE wra.wra_ptid = v4.wra_ptid;
+
+UPDATE arch_follow_up_2_visit_master sd_v3
+SET sd_v3.sd_approx_income_pay = REPLACE(REPLACE(REPLACE(sd_v3.sd_approx_income_pay, 'K', ''), 'k', ''), 'Kk', '')
+WHERE sd_v3.sd_approx_income_pay = 'Yes';
+
+UPDATE arch_follow_up_2_visit_master sd_v3
+SET sd_v3.sd_approx_income_pay = CAST(sd_v3.sd_approx_income_pay AS DECIMAL(12, 2))
+WHERE sd_v3.sd_approx_income_pay REGEXP '^[[:digit:]]+$';
 
 UPDATE arch_follow_up_2_visit_master am
     LEFT JOIN arch_etl_db.wra_physical_exam_and_collection poc ON am.record_id = poc.record_id
-SET am.poc_hx_hypertension     = poc.poc_hx_hypertension
-  , am.bp_vsstat               = poc.bp_vsstat
+SET am.poc_hx_hypertension     = get_YN_Label(poc.poc_hx_hypertension)
+  , am.bp_vsstat               = get_YN_Label(poc.bp_vsstat)
   , am.bp_sys_vsorres          = poc.bp_sys_vsorres
   , am.bp_dia_vsorres          = poc.bp_dia_vsorres
   , am.poc_is_cr_required      = CAST(poc.poc_is_cr_required as UNSIGNED)
   , am.pulse_vsorres           = poc.pulse_vsorres
-  , am.last_sex_scorres        = poc.last_sex_scorres
-  , am.poc_wsh_lub             = poc.poc_wsh_lub
-  , am.poc_lt_antibiotics      = poc.poc_lt_antibiotics
-  , am.swab_spcperf            = poc.swab_spcperf
-  , am.swab_spcreasnd          = poc.swab_spcreasnd
-  , am.swab_othr_spcreasnd     = poc.swab_othr_spcreasnd
-  , am.poc_urine_preg_test_done= poc.poc_urine_preg_test_done
-  , am.upt_lborres             = poc.upt_lborres
+  , am.last_sex_scorres        = poc.last_sex_scorres_label
+  , am.poc_wsh_lub             = poc.poc_wsh_lub_label
+  , am.poc_lt_antibiotics      = poc.poc_lt_antibiotics_label
+  , am.swab_spcperf            = poc.swab_spcperf_label
+  , am.swab_spcreasnd          = IF(poc.swab_othr_spcreasnd = 5, useTextTransformer(poc.swab_othr_spcreasnd),
+                                    poc.swab_spcreasnd_label)
+  , am.swab_othr_spcreasnd     = useTextTransformer(poc.swab_othr_spcreasnd)
+  , am.poc_urine_preg_test_done= get_YN_Label(poc.poc_urine_preg_test_done)
+  , am.upt_lborres             = poc.upt_lborres_label
   , am.zpoc_preg_date          = poc.zpoc_preg_date
   , am.zpoc_preg_date_2        = poc.zpoc_preg_date_2
   , am.poc_preg_id             = poc.poc_preg_id
   , am.poc_preg_id_2           = poc.poc_preg_id_2
-  , am.upt_spcperf             = poc.upt_spcperf
-  , am.poc_reason_upt_nd_oth   = poc.poc_reason_upt_nd_oth
-  , am.poc_comments_yn         = poc.poc_comments_yn
-  , am.poc_comments            = poc.poc_comments
+  , am.upt_spcperf             = IF(poc.upt_spcperf = 4, TRIM(poc.poc_reason_upt_nd_oth), poc.upt_spcperf_label)
+  , am.poc_reason_upt_nd_oth   = TRIM(poc.poc_reason_upt_nd_oth)
+  , am.poc_comments_yn         = get_YN_Label(poc.poc_comments_yn)
+  , am.poc_comments            = useTextTransformer(poc.poc_comments)
   , am.weight_peres            = poc.weight_peres
   , am.height_peres            = poc.height_peres
   , am.bmi                     = poc.bmi
   , am.anth_bmi_result         = poc.anth_bmi_result
-  , am.pe_coyn                 = poc.pe_coyn
-  , am.wra_anthro_comments     = poc.wra_anthro_comments
+  , am.pe_coyn                 = get_YN_Label(poc.pe_coyn)
+  , am.wra_anthro_comments     = useTextTransformer(poc.wra_anthro_comments)
 WHERE poc.redcap_event_name = 'wra_followup_visit_arm_1b';
 
 UPDATE arch_follow_up_2_visit_master am
     LEFT JOIN arch_etl_db.wrafu_pregnancy_assessments_2 pa ON am.record_id = pa.record_id
-SET am.poa_ant_preg            = pa.poa_ant_preg_f2
-  , am.poa_ant_att             = pa.poa_ant_att_f2
+SET am.poa_ant_preg            = get_YN_Label(pa.poa_ant_preg_f2)
+  , am.poa_ant_att             = IF(pa.poa_ant_att_f2 = 1, CONCAT(pa.poa_ant_count_f2, ' times'),
+                                    pa.poa_ant_att_f2_label)
   , am.poa_ant_count           = pa.poa_ant_count_f2
-  , am.poa_fetus_count         = pa.poa_fetus_count_f2
-  , am.poa_preg_outcome        = pa.poa_preg_outcome_f2
-  , am.poa_preg_dev_outcome    = pa.poa_preg_dev_outcome_f2
+  , am.poa_fetus_count         = pa.poa_fetus_count_f2_label
+  , am.poa_preg_outcome        = pa.poa_preg_outcome_f2_label
+  , am.poa_preg_dev_outcome    = pa.poa_preg_dev_outcome_f2_label
   , am.poa_mae_pregend_date    = pa.poa_mae_pregend_date_f2
-  , am.poa_preg_dur            = pa.poa_preg_dur_f2
+  , am.poa_preg_dur            = useAutoChoiceTrimmer(pa.poa_preg_dur_f2)
   , am.poa_preg_dur_weeks      = pa.poa_preg_dur_weeks_f2
   , am.poa_preg_dur_months     = pa.poa_preg_dur_months_f2
   , am.poa_pregdev_date        = pa.poa_pregdev_date_f2
-  , am.poa_pregdev_dur         = pa.poa_pregdev_dur_f2
+  , am.poa_pregdev_dur         = useAutoChoiceTrimmer(pa.poa_pregdev_dur_f2)
   , am.poa_pregdev_dur_weeks   = pa.poa_pregdev_dur_weeks_f2
   , am.poa_pregdev_dur_months  = pa.poa_pregdev_dur_months_f2
-  , am.poa_comments_yn         = pa.poa_comments_yn_f2
-  , am.poa_comments            = pa.poa_comments_f2
-  , am.np_zapps_scorres        = pa.np_fu_zapps_scorres_f2
-  , am.np_zapps_ptid           = pa.np_fu_zapps_ptid_f2
-  , am.np_zapps_id_src         = pa.np_fu_zapps_id_src_f2
-  , am.np_ident_arch           = pa.np_fu_ident_arch_f2
-  , am.np_ptw_1                = pa.np_fu_ptw_f2___1
-  , am.np_ptw_2                = pa.np_fu_ptw_f2___2
-  , am.np_ptw_3                = pa.np_fu_ptw_f2___3
-  , am.np_ptw_4                = pa.np_fu_ptw_f2___4
-  , am.np_ptw_5                = pa.np_fu_ptw_f2___5
-  , am.np_ptw_6                = pa.np_fu_ptw_f2___6
-  , am.np_ptw_7                = pa.np_fu_ptw_f2___7
-  , am.np_anc_mhyn             = pa.np_fu_anc_mhyn_f2
+  , am.poa_comments_yn         = get_YN_Label(pa.poa_comments_yn_f2)
+  , am.poa_comments            = useTextTransformer(pa.poa_comments_f2)
+  , am.np_zapps_scorres        = pa.np_fu_zapps_scorres_f2_label
+  , am.np_zapps_ptid           = TRIM(pa.np_fu_zapps_ptid_f2)
+  , am.np_zapps_id_src         = pa.np_fu_zapps_id_src_f2_label
+  , am.np_ident_arch           = get_YN_Label(pa.np_fu_ident_arch_f2)
+  , am.np_ptw_1                = pa.np_fu_ptw_f2___1_label
+  , am.np_ptw_2                = pa.np_fu_ptw_f2___2_label
+  , am.np_ptw_3                = pa.np_fu_ptw_f2___3_label
+  , am.np_ptw_4                = pa.np_fu_ptw_f2___4_label
+  , am.np_ptw_5                = pa.np_fu_ptw_f2___5_label
+  , am.np_ptw_6                = pa.np_fu_ptw_f2___6_label
+  , am.np_ptw_7                = pa.np_fu_ptw_f2___7_label
+  , am.np_anc_mhyn             = get_YN_Label(pa.np_fu_anc_mhyn_f2)
   , am.np_anc_num_mh           = pa.np_fu_anc_num_mh_f2
   , am.np_anc1_dat             = pa.np_fu_anc1_dat_f2
-  , am.np_anc1_ga              = pa.np_fu_anc1_ga_f2
+  , am.np_anc1_ga              = IF(pa.np_fu_anc1_ga_f2 = 98, pa.np_fu_anc1_ga_f2_label,
+                                    useAutoChoiceTrimmer(pa.np_fu_anc1_ga_f2_label))
   , am.anc1_ga_weeks           = pa.fu_anc1_ga_weeks_f2
   , am.anc1_ga_months          = pa.fu_anc1_ga_months_f2
-  , am.np_anc_plan_obsloc      = pa.np_fu_anc_plan_obsloc_f2
-  , am.birth_plan_fac_obsloc   = pa.fu_birth_plan_fac_obsloc_f2
-  , am.facility_other          = pa.fu_facility_other_f2
-  , am.birth_other_loc         = pa.fu_birth_other_loc_f2
-  , am.np_del_decide_scorres   = pa.np_fu_del_decide_scorres_f2
+  , am.np_anc_plan_obsloc      = pa.np_fu_anc_plan_obsloc_f2_label
+  , am.birth_plan_fac_obsloc   = IF(pa.fu_birth_plan_fac_obsloc_f2 = 88, TRIM(fu_birth_other_loc_f2),
+                                    fu_birth_plan_fac_obsloc_f2_label)
+  , am.facility_other          = pa.fu_facility_other_f2_label
+  , am.birth_other_loc         = TRIM(pa.fu_birth_other_loc_f2)
+  , am.np_del_decide_scorres   = IF(pa.np_fu_del_decide_scorres_f2 = 88, TRIM(pa.fu_del_decide_spfy_scorres_f2),
+                                    pa.np_fu_del_decide_scorres_f2_label)
   , am.del_decide_spfy_scorres = pa.fu_del_decide_spfy_scorres_f2
-  , am.cph_comments_yn         = pa.np_fu_comments_yn_f2
-  , am.cph_comments            = pa.np_fu_comments_f2
-  , am.np_alc_suyn             = pa.np_fu_alc_suyn_f2
-  , am.np_alc_cons             = pa.np_fu_alc_cons_f2
-  , am.np_tob_suyn             = pa.np_fu_tob_suyn_f2
-  , am.np_tob_cur_sudosfrq     = pa.np_fu_tob_curr_sudosfrq_f2
-  , am.tob_oth_sutrt_1         = pa.fu_tob_oth_stutrt_f2___1
-  , am.tob_oth_sutrt_2         = pa.fu_tob_oth_stutrt_f2___2
-  , am.tob_oth_sutrt_3         = pa.fu_tob_oth_stutrt_f2___3
-  , am.tob_oth_sutrt_4         = pa.fu_tob_oth_stutrt_f2___4
-  , am.tob_oth_sutrt_5         = pa.fu_tob_oth_stutrt_f2___5
-  , am.tob_oth_sutrt_6         = pa.fu_tob_oth_stutrt_f2___6
-  , am.tob_oth_sutrt_7         = pa.fu_tob_oth_stutrt_f2___7
-  , am.other_tbc_use           = pa.fu_other_tbc_use_f2
-  , am.np_drug_suyn            = pa.np_fu_drug_suyn_f2
-  , am.np_drug_usage           = pa.np_fu_drug_usage_f2
-  , am.np_drug_sutrt_1         = pa.np_fu_drug_sutrt_f2___1
-  , am.np_drug_sutrt_2         = pa.np_fu_drug_sutrt_f2___2
-  , am.np_drug_sutrt_3         = pa.np_fu_drug_sutrt_f2___3
-  , am.np_drug_sutrt_4         = pa.np_fu_drug_sutrt_f2___4
-  , am.np_drug_sutrt_5         = pa.np_fu_drug_sutrt_f2___5
-  , am.np_drug_sutrt_6         = pa.np_fu_drug_sutrt_f2___6
-  , am.np_drug_sutrt_7         = pa.np_fu_drug_sutrt_f2___7
-  , am.np_drug_sutrt_othr      = pa.np_fu_drug_sutrt_othr_f2
-  , am.hbp_comments_yn         = pa.hbp_fu_comments_yn_f2
-  , am.hbp_comments            = pa.hbp_fu_comments_f2
-  , am.name_veri               = pa.fu_name_veri_f2
-  , am.brthdat_veri            = pa.fu_brthdat_veri_f2
-  , am.ref_likely_scorres      = pa.fu_ref_likely_scorres_f2
-  , am.ref_res_decline_1       = pa.fu_ref_res_decline_f2___1
-  , am.ref_res_decline_2       = pa.fu_ref_res_decline_f2___2
-  , am.ref_res_decline_3       = pa.fu_ref_res_decline_f2___3
-  , am.ref_res_decline_4       = pa.fu_ref_res_decline_f2___4
-  , am.ref_res_decline_5       = pa.fu_ref_res_decline_f2___5
-  , am.ref_res_decline_6       = pa.fu_ref_res_decline_f2___6
-  , am.zr_2_other              = pa.zr_fu_reas_other_f2
-  , am.pref_zapps_scorres      = pa.zr_fu_pref_zapps_scorres_f2
+  , am.cph_comments_yn         = get_YN_Label(pa.np_fu_comments_yn_f2)
+  , am.cph_comments            = useTextTransformer(pa.np_fu_comments_f2)
+  , am.np_alc_suyn             = get_YN_Label(pa.np_fu_alc_suyn_f2)
+  , am.np_alc_cons             = pa.np_fu_alc_cons_f2_label
+  , am.np_tob_suyn             = get_YN_Label(pa.np_fu_tob_suyn_f2)
+  , am.np_tob_cur_sudosfrq     = pa.np_fu_tob_curr_sudosfrq_f2_label
+  , am.tob_oth_sutrt_1         = pa.fu_tob_oth_stutrt_f2___1_label
+  , am.tob_oth_sutrt_2         = pa.fu_tob_oth_stutrt_f2___2_label
+  , am.tob_oth_sutrt_3         = pa.fu_tob_oth_stutrt_f2___3_label
+  , am.tob_oth_sutrt_4         = pa.fu_tob_oth_stutrt_f2___4_label
+  , am.tob_oth_sutrt_5         = pa.fu_tob_oth_stutrt_f2___5_label
+  , am.tob_oth_sutrt_6         = pa.fu_tob_oth_stutrt_f2___6_label
+  , am.tob_oth_sutrt_7         = pa.fu_tob_oth_stutrt_f2___7_label
+  , am.other_tbc_use           = useAutoTrimmer(pa.fu_other_tbc_use_f2)
+  , am.np_drug_suyn            = get_YN_Label(pa.np_fu_drug_suyn_f2)
+  , am.np_drug_usage           = pa.np_fu_drug_usage_f2_label
+  , am.np_drug_sutrt_1         = pa.np_fu_drug_sutrt_f2___1_label
+  , am.np_drug_sutrt_2         = pa.np_fu_drug_sutrt_f2___2_label
+  , am.np_drug_sutrt_3         = pa.np_fu_drug_sutrt_f2___3_label
+  , am.np_drug_sutrt_4         = pa.np_fu_drug_sutrt_f2___4_label
+  , am.np_drug_sutrt_5         = pa.np_fu_drug_sutrt_f2___5_label
+  , am.np_drug_sutrt_6         = pa.np_fu_drug_sutrt_f2___6_label
+  , am.np_drug_sutrt_7         = pa.np_fu_drug_sutrt_f2___7_label
+  , am.np_drug_sutrt_othr      = useAutoTrimmer(pa.np_fu_drug_sutrt_othr_f2)
+  , am.hbp_comments_yn         = get_YN_Label(pa.hbp_fu_comments_yn_f2)
+  , am.hbp_comments            = useTextTransformer(pa.hbp_fu_comments_f2)
+  , am.name_veri               = pa.fu_name_veri_f2_label
+  , am.brthdat_veri            = pa.fu_brthdat_veri_f2_label
+  , am.ref_likely_scorres      = get_YN_Label(pa.fu_ref_likely_scorres_f2)
+  , am.ref_res_decline_1       = pa.fu_ref_res_decline_f2___1_label
+  , am.ref_res_decline_2       = pa.fu_ref_res_decline_f2___2_label
+  , am.ref_res_decline_3       = pa.fu_ref_res_decline_f2___3_label
+  , am.ref_res_decline_4       = pa.fu_ref_res_decline_f2___4_label
+  , am.ref_res_decline_5       = pa.fu_ref_res_decline_f2___5_label
+  , am.ref_res_decline_6       = pa.fu_ref_res_decline_f2___6_label
+  , am.zr_2_other              = useAutoTrimmer(pa.zr_fu_reas_other_f2)
+  , am.pref_zapps_scorres      = pa.zr_fu_pref_zapps_scorres_f2_label
   , am.apnt_dat_scorres        = pa.zr_fu_apnt_dat_scorres_f2
-  , am.zr_confirm_contact      = pa.zr_fu_confirm_contact_f2
+  , am.zr_confirm_contact      = pa.zr_fu_confirm_contact_f2_label
   , am.preg_test               = pa.fu_preg_test_f2
-  , am.zr_wra_ptid             = pa.zr_fu_wra_ptid_f2
-  , am.zr_comm_yn              = pa.zr_fu_comments_yn_f2
-  , am.zr_comm                 = pa.zr_fu_comments_f2
+  , am.zr_wra_ptid             = TRIM(pa.zr_fu_wra_ptid_f2)
+  , am.zr_comm_yn              = get_YN_Label(pa.zr_fu_comments_yn_f2)
+  , am.zr_comm                 = useTextTransformer(pa.zr_fu_comments_f2)
 WHERE (pa.poa_ant_preg_f2 IS NOT NULL OR pa.np_fu_zapps_scorres_f2 IS NOT NULL
     OR pa.fu_name_veri_f2 IS NOT NULL)
   AND am.visit_number = 3.0;
 
 UPDATE arch_follow_up_2_visit_master am
     LEFT JOIN arch_etl_db.wrafu_infant_outcome_assessment_repeating_instruments io ON am.record_id = io.record_id
-SET am.ioa_infant_name     = io.ioa_infant_name_f2,
-    am.ioa_infant_ptid     = CONCAT_WS('-', am.wra_ptid, useAutoTrimmer(io.ioa_infant_name_f2)),
-    am.ioa_infant_sex      = io.ioa_infant_sex_f2,
-    am.ioa_infant_alive    = io.ioa_infant_alive_f2,
-    am.ioa_infant_age_days = io.ioa_infant_age_days_f2,
-    am.ioa_infant_age_days = io.ioa_infant_age_months_f2,
-    am.ioa_infant_age_days = io.ioa_infant_age_death_days_f2,
-    am.ioa_infant_age_days = io.ioa_infant_age_death_months_f2
+SET am.ioa_infant_name             = useAutoTrimmer(io.ioa_infant_name_f2),
+    am.ioa_infant_ptid             = CONCAT_WS('-', am.wra_ptid, useAutoTrimmer(io.ioa_infant_name_f2)),
+    am.ioa_infant_sex              = io.ioa_infant_sex_f2_label,
+    am.ioa_infant_alive            = io.ioa_infant_alive_f2_label,
+    am.ioa_infant_age              = useAutoChoiceTrimmer(io.ioa_infant_age_f2),
+    am.ioa_infant_age_days         = io.ioa_infant_age_days_f2,
+    am.ioa_infant_age_months       = io.ioa_infant_age_months_f2,
+    am.ioa_infant_age_death        = useAutoChoiceTrimmer(io.ioa_infant_age_death_f2),
+    am.ioa_infant_age_death_days   = io.ioa_infant_age_death_days_f2,
+    am.ioa_infant_age_death_months = io.ioa_infant_age_death_months_f2
 WHERE io.redcap_repeat_instance = 1
   AND io.redcap_event_name = 'wra_followup_visit_arm_1b'
   AND am.visit_number = 3.0;
 
 UPDATE arch_follow_up_2_visit_master am
     LEFT JOIN arch_etl_db.wrafu_infant_outcome_assessment_repeating_instruments io ON am.record_id = io.record_id
-SET am.ioa_infant_name_2     = io.ioa_infant_name_f2,
-    am.ioa_infant_ptid_2     = CONCAT_WS('-', am.wra_ptid, useAutoTrimmer(io.ioa_infant_name_f2)),
-    am.ioa_infant_sex_2      = io.ioa_infant_sex_f2,
-    am.ioa_infant_alive_2    = io.ioa_infant_alive_f2,
-    am.ioa_infant_age_days_2 = io.ioa_infant_age_days_f2,
-    am.ioa_infant_age_days_2 = io.ioa_infant_age_months_f2,
-    am.ioa_infant_age_days_2 = io.ioa_infant_age_death_days_f2,
-    am.ioa_infant_age_days_2 = io.ioa_infant_age_death_months_f2
+SET am.ioa_infant_name             = useAutoTrimmer(io.ioa_infant_name_f2),
+    am.ioa_infant_ptid             = CONCAT_WS('-', am.wra_ptid, useAutoTrimmer(io.ioa_infant_name_f2)),
+    am.ioa_infant_sex              = io.ioa_infant_sex_f2_label,
+    am.ioa_infant_alive            = io.ioa_infant_alive_f2_label,
+    am.ioa_infant_age              = useAutoChoiceTrimmer(io.ioa_infant_age_f2),
+    am.ioa_infant_age_days         = io.ioa_infant_age_days_f2,
+    am.ioa_infant_age_months       = io.ioa_infant_age_months_f2,
+    am.ioa_infant_age_death        = useAutoChoiceTrimmer(io.ioa_infant_age_death_f2),
+    am.ioa_infant_age_death_days   = io.ioa_infant_age_death_days_f2,
+    am.ioa_infant_age_death_months = io.ioa_infant_age_death_months_f2
 WHERE io.redcap_repeat_instance = 2
   AND io.redcap_event_name = 'wra_followup_visit_arm_1b'
   AND am.visit_number = 3.0;
 
 UPDATE arch_follow_up_2_visit_master am
     LEFT JOIN arch_etl_db.clinical_referral_repeating_instruments cr ON am.record_id = cr.record_id
-SET am.cr_refer_to            = cr.cr_refer_to
+SET am.cr_refer_to            = IF(cr.cr_refer_to = 4, useAutoTrimmer(cr.cr_refer_to_other), cr.cr_refer_to_label)
   , am.cr_refer_to_other      = cr.cr_refer_to_other
-  , am.referral_reasons_1     = cr.referral_reasons___1
-  , am.referral_reasons_2     = cr.referral_reasons___2
-  , am.referral_reasons_3     = cr.referral_reasons___3
-  , am.referral_reasons_4     = cr.referral_reasons___4
-  , am.referral_reasons_5     = cr.referral_reasons___5
-  , am.referral_reasons_6     = cr.referral_reasons___6
-  , am.referral_reasons_7     = cr.referral_reasons___7
+  , am.referral_reasons_1     = cr.referral_reasons___1_label
+  , am.referral_reasons_2     = cr.referral_reasons___2_label
+  , am.referral_reasons_3     = cr.referral_reasons___3_label
+  , am.referral_reasons_4     = cr.referral_reasons___4_label
+  , am.referral_reasons_5     = cr.referral_reasons___5_label
+  , am.referral_reasons_6     = cr.referral_reasons___6_label
+  , am.referral_reasons_7     = cr.referral_reasons___7_label
   , am.referral_reasons_other = cr.referral_reasons_other
-  , am.cr_ra_comments_yn      = cr.cr_ra_comments_yn
-  , am.cr_ra_comments         = cr.cr_ra_comments
+  , am.cr_ra_comments_yn      = get_YN_Label(cr.cr_ra_comments_yn)
+  , am.cr_ra_comments         = useTextTransformer(cr.cr_ra_comments)
 WHERE cr.redcap_repeat_instance = 1
   AND cr.redcap_event_name = 'wra_followup_visit_arm_1b'
   AND am.visit_number = 3.0;
 
 UPDATE arch_follow_up_2_visit_master am
     LEFT JOIN arch_etl_db.clinical_referral_repeating_instruments cr ON am.record_id = cr.record_id
-SET am.cr_refer_to_1            = cr.cr_refer_to
-  , am.cr_refer_to_other_1      = cr.cr_refer_to_other
-  , am.referral_reasons_1_1     = cr.referral_reasons___1
-  , am.referral_reasons_2_1     = cr.referral_reasons___2
-  , am.referral_reasons_3_1     = cr.referral_reasons___3
-  , am.referral_reasons_4_1     = cr.referral_reasons___4
-  , am.referral_reasons_5_1     = cr.referral_reasons___5
-  , am.referral_reasons_6_1     = cr.referral_reasons___6
-  , am.referral_reasons_7_1     = cr.referral_reasons___7
-  , am.referral_reasons_other_1 = cr.referral_reasons_other
-  , am.cr_ra_comments_yn_1      = cr.cr_ra_comments_yn
-  , am.cr_ra_comments_1         = cr.cr_ra_comments
+SET am.cr_refer_to_2            = IF(cr.cr_refer_to = 4, useAutoTrimmer(cr.cr_refer_to_other), cr.cr_refer_to_label)
+  , am.cr_refer_to_other_2      = cr.cr_refer_to_other
+  , am.referral_reasons_1_2     = cr.referral_reasons___1_label
+  , am.referral_reasons_2_2     = cr.referral_reasons___2_label
+  , am.referral_reasons_3_2     = cr.referral_reasons___3_label
+  , am.referral_reasons_4_2     = cr.referral_reasons___4_label
+  , am.referral_reasons_5_2     = cr.referral_reasons___5_label
+  , am.referral_reasons_6_2     = cr.referral_reasons___6_label
+  , am.referral_reasons_7_2     = cr.referral_reasons___7_label
+  , am.referral_reasons_other_2 = cr.referral_reasons_other
+  , am.cr_ra_comments_yn_2      = get_YN_Label(cr.cr_ra_comments_yn)
+  , am.cr_ra_comments_2         = useTextTransformer(cr.cr_ra_comments)
 WHERE cr.redcap_repeat_instance = 2
   AND cr.redcap_event_name = 'wra_followup_visit_arm_1b'
   AND am.visit_number = 3.0;
 
 UPDATE arch_follow_up_2_visit_master am
     LEFT JOIN arch_etl_db.clinical_referral_repeating_instruments cr ON am.record_id = cr.record_id
-SET am.cr_refer_to_2            = cr.cr_refer_to
+SET am.cr_refer_to_2            = IF(cr.cr_refer_to = 4, useAutoTrimmer(cr.cr_refer_to_other), cr.cr_refer_to_label)
   , am.cr_refer_to_other_2      = cr.cr_refer_to_other
-  , am.referral_reasons_1_2     = cr.referral_reasons___1
-  , am.referral_reasons_2_2     = cr.referral_reasons___2
-  , am.referral_reasons_3_2     = cr.referral_reasons___3
-  , am.referral_reasons_4_2     = cr.referral_reasons___4
-  , am.referral_reasons_5_2     = cr.referral_reasons___5
-  , am.referral_reasons_6_2     = cr.referral_reasons___6
-  , am.referral_reasons_7_2     = cr.referral_reasons___7
+  , am.referral_reasons_1_2     = cr.referral_reasons___1_label
+  , am.referral_reasons_2_2     = cr.referral_reasons___2_label
+  , am.referral_reasons_3_2     = cr.referral_reasons___3_label
+  , am.referral_reasons_4_2     = cr.referral_reasons___4_label
+  , am.referral_reasons_5_2     = cr.referral_reasons___5_label
+  , am.referral_reasons_6_2     = cr.referral_reasons___6_label
+  , am.referral_reasons_7_2     = cr.referral_reasons___7_label
   , am.referral_reasons_other_2 = cr.referral_reasons_other
-  , am.cr_ra_comments_yn_2      = cr.cr_ra_comments_yn
-  , am.cr_ra_comments_2         = cr.cr_ra_comments
+  , am.cr_ra_comments_yn_2      = get_YN_Label(cr.cr_ra_comments_yn)
+  , am.cr_ra_comments_2         = useTextTransformer(cr.cr_ra_comments)
 WHERE cr.redcap_repeat_instance = 3
   AND cr.redcap_event_name = 'wra_followup_visit_arm_1b'
   AND am.visit_number = 3.0;
 
 UPDATE arch_follow_up_2_visit_master am
     LEFT JOIN arch_etl_db.outmigration om ON am.record_id = om.record_id
-SET am.om_name_scorres        = om.om_name_scorres
-  , am.return_scorres        = om.return_scorres
-  , am.om_comments_yn        = om.om_comments_yn
-  , am.om_comments        = om.om_comments
+SET am.om_name_scorres = om.om_name_scorres_label
+  , am.return_scorres  = om.return_scorres_label
+  , am.om_comments_yn  = get_YN_Label(om.om_comments_yn)
+  , am.om_comments     = useTextTransformer(om.om_comments)
 WHERE om.redcap_event_name = 'wra_followup_visit_arm_1b'
   AND am.visit_number = 3.0;
 
 UPDATE arch_follow_up_2_visit_master am
     LEFT JOIN arch_etl_db.wra_study_closure sc ON am.record_id = sc.record_id
-SET am.sc_1        = sc.sc_1
-  , am.sc_2        = sc.sc_2
-  , am.sc_3        = sc.sc_3
-  , am.sc_5        = sc.sc_5
-  , am.sc_6        = sc.sc_6
-  , am.sc_7        = sc.sc_7
+SET am.sc_1        = get_YN_Label(sc.sc_1)
+  , am.sc_2        = sc.sc_2_label
+  , am.sc_3        = get_YN_Label(sc.sc_3)
+  , am.sc_5        = get_YN_Label(sc.sc_5)
+  , am.sc_6        = sc.sc_6_label
+  , am.sc_7        = IF(sc.sc_7 = 9, useAutoTrimmer(sc.sc_7_other), sc.sc_7_label)
   , am.sc_7_other  = sc.sc_7_other
   , am.sc_8        = sc.sc_8
-  , am.sc_9        = sc.sc_9
-  , am.sc_10       = sc.sc_10
+  , am.sc_9        = useTextTransformer(sc.sc_9)
+  , am.sc_10       = IF(sc.sc_10 = 96, useAutoTrimmer(sc.sc_10_other), sc.sc_10_label)
   , am.sc_10_other = sc.sc_10_other
-  , am.sc_11       = sc.sc_11
-  , am.sc_comm_yn  = sc.sc_comm_yn
-  , am.sc_comm     = sc.sc_comm
+  , am.sc_11       = get_YN_Label(sc.sc_11)
+  , am.sc_comm_yn  = get_YN_Label(sc.sc_comm_yn)
+  , am.sc_comm     = useTextTransformer(sc.sc_comm)
 WHERE sc.redcap_event_name = 'wra_followup_visit_arm_1b'
   AND am.visit_number = 3.0;
